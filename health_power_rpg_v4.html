@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>Health & Power RPG</title>
+<style>
+:root{
+  --bg:#0b1020;--panel:#121a2d;--panel2:#18233c;--text:#f8fafc;--muted:#94a3b8;
+  --gold:#f5c451;--green:#4ade80;--border:#26344f;--danger:#fb7185;
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#080c18,#0b1020 35%,#10162a);color:var(--text);
+font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+.app{max-width:980px;margin:auto;padding:20px 16px 48px}
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:stretch}
+.panel{background:rgba(18,26,45,.96);border:1px solid var(--border);border-radius:22px;padding:18px}
+.eyebrow{font-size:11px;font-weight:900;letter-spacing:.18em;color:#a5b4fc}
+h1{font-size:clamp(30px,7vw,60px);line-height:.95;margin:6px 0 10px;letter-spacing:-.05em}
+h2{margin:0 0 12px;font-size:20px}
+p{color:var(--muted);margin:0}
+.level{display:flex;gap:14px;align-items:center;margin-top:20px}
+.levelbadge{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 30% 30%,#fef3c7,#f5c451 45%,#9a6b10);color:#111827;border:3px solid #fff1a8;box-shadow:0 0 35px rgba(245,196,81,.18)}
+.levelbadge span{font-size:11px;font-weight:900;display:block;text-align:center}
+.levelbadge strong{font-size:28px;line-height:.9}
+.xp{flex:1}
+.row{display:flex;justify-content:space-between;gap:10px;font-size:12px;font-weight:800}
+.bar{height:12px;background:#0b1221;border-radius:999px;overflow:hidden;margin-top:7px;border:1px solid #22304b}
+.fill{height:100%;background:linear-gradient(90deg,#22c55e,#f5c451);width:0;transition:.3s}
+.character-wrap{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;min-height:300px}
+.char-stage{font-size:12px;letter-spacing:.14em;font-weight:900;color:#c4b5fd;margin-bottom:8px}
+.character{width:190px;height:190px;position:relative;display:grid;place-items:center;margin:4px auto 12px}
+.aura{position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,.22),rgba(99,102,241,0) 68%);filter:blur(1px)}
+.body-avatar{--chest:0;--pull:0;--thick:0;--lean:0;position:relative;width:150px;height:180px;transform:scale(calc(.90 + var(--thick)*.10));transition:.35s}
+.head{position:absolute;left:58px;top:2px;width:34px;height:38px;border-radius:48% 48% 44% 44%;background:#d6a27b;border:2px solid #0f172a}
+.neck{position:absolute;left:64px;top:34px;width:22px;height:18px;background:#c88e68;border-radius:5px}
+.torso{position:absolute;left:38px;top:48px;width:74px;height:82px;background:linear-gradient(180deg,#c99069,#b97956);border:2px solid #0f172a;border-radius:18px 18px 14px 14px;transform:scaleX(calc(.92 + var(--chest)*.12 + var(--thick)*.08));transform-origin:center top}
+.chest{position:absolute;top:8px;width:29px;height:22px;border-radius:50%;background:#d8a07a;border-bottom:2px solid rgba(15,23,42,.55);transform:scale(calc(.9 + var(--chest)*.22))}.chest-l{left:8px}.chest-r{right:8px}
+.abs{position:absolute;left:27px;top:36px;width:20px;height:36px;border-left:2px solid rgba(15,23,42,.45);border-right:2px solid rgba(15,23,42,.45);opacity:calc(.10 + var(--lean)*.9)}
+.abs:before,.abs:after{content:"";position:absolute;left:-10px;width:38px;border-top:2px solid rgba(15,23,42,.42)}.abs:before{top:10px}.abs:after{top:23px}
+.trap{position:absolute;top:40px;width:28px;height:18px;background:#bf825f;border:2px solid #0f172a;z-index:-1}.trap-l{left:34px;border-radius:18px 6px 8px 8px;transform-origin:right bottom;transform:scale(calc(.86 + var(--pull)*.30 + var(--thick)*.10))}.trap-r{right:34px;border-radius:6px 18px 8px 8px;transform-origin:left bottom;transform:scale(calc(.86 + var(--pull)*.30 + var(--thick)*.10))}
+.arm{position:absolute;top:58px;width:24px;height:78px;background:#c88e68;border:2px solid #0f172a;border-radius:16px}.arm-l{left:17px;transform-origin:right top;transform:scaleX(calc(.88 + var(--pull)*.20 + var(--thick)*.05))}.arm-r{right:17px;transform-origin:left top;transform:scaleX(calc(.88 + var(--pull)*.20 + var(--thick)*.05))}
+.bicep{position:absolute;top:15px;left:2px;width:16px;height:25px;border-radius:50%;background:#d79b73;transform:scale(calc(.9 + var(--pull)*.30))}
+.leg{position:absolute;top:124px;width:29px;height:55px;background:#293754;border:2px solid #0f172a;border-radius:8px 8px 12px 12px;transform:scaleX(calc(.92 + var(--thick)*.12))}.leg-l{left:43px}.leg-r{right:43px}
+.character.lv9 .crown{display:block}
+.character.lv7 .aura{background:radial-gradient(circle,rgba(245,196,81,.22),rgba(99,102,241,.08) 42%,rgba(99,102,241,0) 70%)}
+.physique-readout{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 10px;margin-top:12px;width:100%;font-size:10px;color:var(--muted)}.physique-readout b{color:#e2e8f0}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:16px}
+.stat{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:14px;min-width:0}
+.stat .icon{font-size:24px}.stat h3{margin:8px 0 4px;font-size:15px}.stat .value{font-size:20px;font-weight:900;word-break:break-word}.small{font-size:11px;color:var(--muted);margin-top:4px}
+.stat .bar{height:8px;margin-top:10px}
+.quest{margin-top:16px}
+.formgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+label{font-size:12px;font-weight:800;color:#dbeafe;display:flex;flex-direction:column;gap:6px}
+input,select,button{font:inherit}
+input,select{min-height:46px;border-radius:12px;border:1px solid #334155;background:#0c1425;color:white;padding:10px 12px;font-size:16px;width:100%}
+button{min-height:46px;border:0;border-radius:12px;padding:10px 14px;font-weight:900;cursor:pointer}
+.primary{background:var(--gold);color:#111827}.secondary{background:#24314d;color:#fff}.danger{background:#3a1e2b;color:#fecdd3}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.message{min-height:22px;margin-top:12px;color:#cbd5e1;font-size:13px}
+.badges,.history{margin-top:16px}
+.badgegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.badge{padding:12px;border-radius:14px;border:1px solid var(--border);background:#0d1527;display:flex;gap:10px;align-items:center;opacity:.35}
+.badge.unlocked{opacity:1;background:#1b2031}.badge .emoji{font-size:24px}.badge b{display:block;font-size:12px}.badge span{font-size:11px;color:var(--muted)}
+.historylist{display:grid;gap:8px}
+.historyitem{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;background:#0d1527;border:1px solid var(--border);font-size:12px}
+.historyitem b{font-size:13px}.date{color:var(--muted);white-space:nowrap}
+.footer{font-size:11px;color:#64748b;text-align:center;margin-top:18px;line-height:1.5}
+@media(max-width:760px){.hero{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.formgrid{grid-template-columns:1fr 1fr}.badgegrid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.stats,.formgrid,.badgegrid{grid-template-columns:1fr}.character-wrap{min-height:260px}.character{width:160px;height:160px}.avatar{font-size:96px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <section class="hero">
+    <div class="panel">
+      <div class="eyebrow">ROAD TO 2027</div>
+      <h1>Health & Power</h1>
+      <p>Build your character by hitting real-world PBs.</p>
+      <div class="level">
+        <div class="levelbadge"><div><span>LEVEL</span><strong id="level">1</strong></div></div>
+        <div class="xp">
+          <div class="row"><span>Overall XP</span><span id="scoreText">0 / 100</span></div>
+          <div class="bar"><div id="overallFill" class="fill"></div></div>
+          <div class="small" id="nextLevel">Earn XP by logging PBs.</div>
+        </div>
+      </div>
+    </div>
+    <div class="panel character-wrap">
+      <div class="char-stage" id="charStage">ROOKIE</div>
+      <div class="character" id="character">
+        <div class="aura"></div>
+        <div class="crown">👑</div>
+        <div class="body-avatar" id="bodyAvatar" aria-label="Health and Power character">
+          <div class="head"></div><div class="neck"></div><div class="trap trap-l"></div><div class="trap trap-r"></div>
+          <div class="torso"><div class="chest chest-l"></div><div class="chest chest-r"></div><div class="abs"></div></div>
+          <div class="arm arm-l"><div class="bicep"></div></div><div class="arm arm-r"><div class="bicep"></div></div>
+          <div class="leg leg-l"></div><div class="leg leg-r"></div>
+        </div>
+      </div>
+      <h2 id="charTitle">The Rookie</h2>
+      <p id="charDesc">Every stat starts somewhere.</p>
+      <div class="physique-readout" id="physiqueReadout"></div>
+    </div>
+  </section>
+
+  <section class="stats" id="stats"></section>
+
+  <section class="panel quest">
+    <div class="eyebrow">CLAIM XP</div>
+    <h2>Log a new PB</h2>
+    <form id="pbForm" class="formgrid">
+      <label>Skill
+        <select id="skill">
+          <option value="bw">⚖️ Mass — Morning BW</option>
+          <option value="bench">🦍 Push — Bench × 5</option>
+          <option value="pull">🧗 Pull — Strict Pull-ups</option>
+          <option value="dead">🏋️ Power — Deadlift × 3</option>
+          <option value="run">🫀 Engine — 40 min Zone 2 distance</option>
+        </select>
+      </label>
+      <label id="valueLabel">Result
+        <input id="value" required placeholder="e.g. 90">
+      </label>
+      <label>Date
+        <input id="date" type="date">
+      </label>
+      <button class="primary" type="submit">⚡ Claim XP</button>
+    </form>
+    <div class="message" id="message" aria-live="polite"></div>
+    <div class="actions">
+      <button class="secondary" id="exportBtn" type="button">Export Save</button>
+      <button class="secondary" id="importBtn" type="button">Import Save</button>
+      <button class="danger" id="resetBtn" type="button">Reset Game</button>
+      <input id="importFile" type="file" accept="application/json" hidden>
+    </div>
+  </section>
+
+  <section class="panel badges">
+    <div class="eyebrow">ACHIEVEMENTS</div>
+    <h2>Badges</h2>
+    <div class="badgegrid" id="badges"></div>
+  </section>
+
+  <section class="panel history">
+    <div class="eyebrow">QUEST LOG</div>
+    <h2>PB History</h2>
+    <div class="historylist" id="history"></div>
+  </section>
+
+  <div class="footer">Engine = distance covered during exactly 40 minutes in Zone 2. 5.00 km is max. Your progress is saved in this browser on this device; export a save occasionally as backup.</div>
+</div>
+<script>
+const goals={
+ bw:{name:"Mass",icon:"⚖️",target:90,start:85,format:v=>Number(v).toFixed(1)+" kg",better:"high"},
+ bench:{name:"Push",icon:"🦍",target:110,start:70,format:v=>Number(v).toFixed(1).replace(".0","")+" kg × 5",better:"high"},
+ pull:{name:"Pull",icon:"🧗",target:8,start:0,format:v=>Math.round(v)+" reps",better:"high"},
+ dead:{name:"Power",icon:"🏋️",target:140,start:60,format:v=>Number(v).toFixed(1).replace(".0","")+" kg × 3",better:"high"},
+ run:{name:"Engine",icon:"🫀",target:5.0,start:2.5,format:v=>Number(v).toFixed(2)+" km / 40 min",better:"high"}
+};
+let state=load()||{pb:{bw:null,bench:null,pull:null,dead:null,run:null},history:[]};
+
+function save(){localStorage.setItem("healthPowerRPG",JSON.stringify(state))}
+function load(){try{return JSON.parse(localStorage.getItem("healthPowerRPG"))}catch(e){return null}}
+function fmtTime(sec){sec=Math.round(sec);return Math.floor(sec/60)+":"+String(sec%60).padStart(2,"0")}
+function parseTime(s){const m=String(s).trim().match(/^(\d{1,2}):([0-5]\d)$/);return m?Number(m[1])*60+Number(m[2]):null}
+function progress(k,v){if(v==null)return 0;const g=goals[k];let p=g.better==="high"?(v-g.start)/(g.target-g.start):(g.start-v)/(g.start-g.target);return Math.max(0,Math.min(1,p))}
+function score(){return Math.round(Object.keys(goals).reduce((a,k)=>a+progress(k,state.pb[k]),0)/5*100)}
+function completedGoals(){return Object.keys(goals).filter(k=>progress(k,state.pb[k])>=1).length}
+function level(){const s=score();if(completedGoals()===5)return 10;return Math.max(1,Math.min(9,Math.floor(s/11)+1));}
+function isBetter(k,n,o){if(o==null)return true;return goals[k].better==="high"?n>o:n<o}
+function charFor(l){
+ if(l<=2)return["ROOKIE","The Rookie","Building the base."];
+ if(l<=4)return["TRAINING ARC","The Grinder","The frame is starting to change."];
+ if(l<=6)return["ATHLETE","The Athlete","Muscle, strength and engine are coming online."];
+ if(l<=8)return["POWERHOUSE","The Powerhouse","The build is becoming seriously well-rounded."];
+ if(l===9)return["ELITE","The Elite","One last push to complete the build."];
+ return["MAX BUILD","Final Form","All five end-of-year goals achieved."];
+}
+function render(){
+ const s=score(),l=level(),c=charFor(l);
+ document.getElementById("level").textContent=l;
+ document.getElementById("scoreText").textContent=s+" / 100";
+ document.getElementById("overallFill").style.width=s+"%";
+ document.getElementById("nextLevel").textContent=l===10?"MAX LEVEL — all goals complete":(5-completedGoals())+" goal"+((5-completedGoals())===1?"":"s")+" remaining";
+ const ch=document.getElementById("character");ch.className="character lv"+l;
+ document.getElementById("charStage").textContent=c[0];
+ document.getElementById("charTitle").textContent=c[1];document.getElementById("charDesc").textContent=c[2];
+ const benchP=progress("bench",state.pb.bench),pullP=progress("pull",state.pb.pull),deadP=progress("dead",state.pb.dead),leanP=progress("run",state.pb.run);
+ const body=document.getElementById("bodyAvatar");body.style.setProperty("--chest",(0.35+benchP*1.65).toFixed(3));body.style.setProperty("--pull",(0.35+pullP*1.65).toFixed(3));body.style.setProperty("--thick",(0.35+deadP*1.65).toFixed(3));body.style.setProperty("--lean",leanP.toFixed(3));
+ document.getElementById("physiqueReadout").innerHTML=`<span>Chest <b>${Math.round(benchP*100)}%</b></span><span>Back / Arms <b>${Math.round(pullP*100)}%</b></span><span>Thickness <b>${Math.round(deadP*100)}%</b></span><span>Leanness <b>${Math.round(leanP*100)}%</b></span>`;
+ document.getElementById("stats").innerHTML=Object.entries(goals).map(([k,g])=>{
+   const v=state.pb[k],p=Math.round(progress(k,v)*100);
+   return `<div class="stat"><div class="icon">${g.icon}</div><h3>${g.name}</h3><div class="value">${v==null?"Not logged":g.format(v)}</div><div class="small">Goal: ${g.format(g.target)}</div><div class="bar"><div class="fill" style="width:${p}%"></div></div><div class="small">${p}% complete</div></div>`;
+ }).join("");
+ const ach=[
+  ["⚔️","Century Club","Bench 100 × 5",state.pb.bench>=100],
+  ["🦍","Ape Mode","6 strict pull-ups",state.pb.pull>=6],
+  ["👑","Pull King","8 strict pull-ups",state.pb.pull>=8],
+  ["🪨","Heavy Hinge","Deadlift 120 × 3",state.pb.dead>=120],
+  ["🔥","Power Unlocked","Deadlift 140 × 3",state.pb.dead>=140],
+  ["🏃","Aerobic Weapon","4.50 km in 40 min Zone 2",state.pb.run!=null&&state.pb.run>=4.5],
+  ["🫀","Engine Online","5.00 km in 40 min Zone 2",state.pb.run!=null&&state.pb.run>=5.0],
+  ["⚖️","Mass Target","Morning BW ≥ 90 kg",state.pb.bw>=90],
+  ["🏆","Maxed Build","Complete all five goals",Object.keys(goals).every(k=>progress(k,state.pb[k])>=1)]
+ ];
+ document.getElementById("badges").innerHTML=ach.map(a=>`<div class="badge ${a[3]?"unlocked":""}"><div class="emoji">${a[0]}</div><div><b>${a[1]}</b><span>${a[2]}</span></div></div>`).join("");
+ const hist=[...state.history].reverse().slice(0,40);
+ document.getElementById("history").innerHTML=hist.length?hist.map(h=>`<div class="historyitem"><div><b>${goals[h.skill].icon} ${goals[h.skill].name}</b><div class="small">${goals[h.skill].format(h.value)}</div></div><div class="date">${h.date}</div></div>`).join(""):`<div class="small">No PBs logged yet. Your quest begins now.</div>`;
+ save();
+}
+function updateInputHint(){
+ const k=document.getElementById("skill").value,el=document.getElementById("value");
+ el.type="number";
+ el.step=(k==="bw"||k==="bench"||k==="dead")?"0.1":k==="run"?"0.01":"1";
+ el.placeholder=k==="run"?"km in 40 min, e.g. 4.20":k==="pull"?"e.g. 5":"e.g. 100";
+}
+document.getElementById("skill").addEventListener("change",updateInputHint);
+document.getElementById("pbForm").addEventListener("submit",e=>{
+ e.preventDefault();
+ const k=document.getElementById("skill").value;
+ const raw=document.getElementById("value").value.trim();
+ const msg=document.getElementById("message");
+ const n=Number(raw);
+
+ if(raw===""||!Number.isFinite(n)||n<0){
+   msg.textContent="Enter a valid result.";
+   return;
+ }
+
+ const old=state.pb[k];
+ if(!isBetter(k,n,old)){
+   msg.textContent=`Current PB is ${old==null?"not set":goals[k].format(old)} — enter a better result to claim XP.`;
+   return;
+ }
+
+ const oldScore=score();
+ state.pb[k]=n;
+ const d=document.getElementById("date").value||new Date().toISOString().slice(0,10);
+ state.history.push({skill:k,value:n,date:d});
+
+ save();
+ render();
+
+ const newScore=score();
+ const xpGain=Math.max(0,newScore-oldScore);
+ msg.textContent=`🎉 NEW PB! ${goals[k].name} → ${goals[k].format(n)}. +${xpGain} XP`;
+ document.getElementById("value").value="";
+});
+document.getElementById("resetBtn").addEventListener("click",()=>{
+ if(confirm("Reset all progress and PB history?")){state={pb:{bw:null,bench:null,pull:null,dead:null,run:null},history:[]};save();render();document.getElementById("message").textContent="Game reset."}
+});
+document.getElementById("exportBtn").addEventListener("click",()=>{
+ const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);a.download="health-power-save.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
+});
+document.getElementById("importBtn").addEventListener("click",()=>document.getElementById("importFile").click());
+document.getElementById("importFile").addEventListener("change",async e=>{
+ const f=e.target.files[0];if(!f)return;
+ try{const obj=JSON.parse(await f.text());if(!obj.pb||!Array.isArray(obj.history))throw 0;state=obj;save();render();document.getElementById("message").textContent="Save imported successfully."}catch{document.getElementById("message").textContent="That save file wasn't valid."}
+});
+document.getElementById("date").value=new Date().toISOString().slice(0,10);
+updateInputHint();render();
+</script>
+</body>
+</html>

@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Health & Power">
-<title>Health & Power RPG v10</title>
+<title>Health & Power RPG v11</title>
 <style>
 :root{
   --bg:#050505;--bg2:#090909;--panel:#0e0e0f;--panel2:#141415;--field:#080809;
@@ -205,6 +205,10 @@ input:focus,select:focus{border-color:#707078;box-shadow:0 0 0 3px rgba(255,255,
 .setup-pair label{font-size:9px;color:#a9a9ae}
 .setup-actions{display:flex;gap:8px;margin-top:14px}.setup-actions button{flex:1;min-height:49px;border:0;border-radius:13px;font-weight:900}
 .close-btn{background:#252527;color:white}.primary-btn{background:var(--gold);color:#111}
+.reset-build-btn{
+  width:100%;min-height:44px;margin-top:9px;border:1px solid #48242a;border-radius:13px;
+  background:#1b0d10;color:#ff9aaa;font-weight:900;font-size:12px
+}
 .goal-note{font-size:9px;color:var(--muted);letter-spacing:0;font-weight:500}
 
 /* Inline character evolution */
@@ -305,7 +309,7 @@ input:focus,select:focus{border-color:#707078;box-shadow:0 0 0 3px rgba(255,255,
 </head>
 <body>
 
-<main class="app" id="home" data-version="10">
+<main class="app" id="home" data-version="11">
   <header class="topbar">
     <div class="headrow">
       <button class="icon-btn" id="menuBtn" type="button" aria-label="Open settings">☰</button>
@@ -455,7 +459,8 @@ input:focus,select:focus{border-color:#707078;box-shadow:0 0 0 3px rgba(255,255,
         <label>END GOAL<input id="goalRun" type="number" step="0.01" required placeholder="5.00"></label>
       </div></div>
     </form>
-    <div class="setup-actions"><button class="close-btn" id="cancelSetup" type="button">Cancel</button><button class="primary-btn" id="saveSetup" type="button">Start the Game ⚡</button></div>
+    <div class="setup-actions"><button class="close-btn" id="cancelSetup" type="button">Cancel</button><button class="primary-btn" id="saveSetup" type="button">Save Build ⚡</button></div>
+    <button class="reset-build-btn" id="resetBuildBtn" type="button">Start Over / Reset Game</button>
     <div class="message" id="setupMessage"></div>
   </div>
 </div>
@@ -548,10 +553,15 @@ function openSetup(){
  const m=document.getElementById("setupModal");m.classList.add("open");m.setAttribute("aria-hidden","false");
  ["bw","bench","pull","dead","run"].forEach(k=>{
    const cap=k[0].toUpperCase()+k.slice(1);
-   if(state.baseline)document.getElementById("start"+cap).value=state.baseline[k];
-   document.getElementById("goal"+cap).value=target(k);
+   const startEl=document.getElementById("start"+cap);
+   const goalEl=document.getElementById("goal"+cap);
+   startEl.value=state.baseline ? state.baseline[k] : "";
+   goalEl.value=state.targets?.[k] ?? defaultTargets[k];
  });
  document.getElementById("cancelSetup").style.display=state.baseline?"block":"none";
+ document.getElementById("resetBuildBtn").style.display=state.baseline?"block":"none";
+ document.getElementById("saveSetup").textContent=state.baseline?"Update Build ⚡":"Start the Game ⚡";
+ document.getElementById("setupMessage").textContent="";
 }
 function closeSetup(){document.getElementById("setupModal").classList.remove("open")}
 function saveBaseline(){
@@ -588,6 +598,16 @@ pbForm.addEventListener("submit",e=>{
  message.className="message success";message.textContent=`🎉 NEW PB! ${goals[k].format(n)} • +${gain} XP`;
  if(newSkill>oldSkill||newOverall>oldOverall)triggerEvolution(k,oldOverall,newOverall,oldSkill,newSkill,gain);else showToast("NEW PB!",`${goals[k].format(n)} • +${gain} XP`);
 });
+function resetGame(){
+ if(!confirm("Start over? This will erase your starting stats, goals, PB history and XP on this device."))return;
+ localStorage.removeItem(STORE);
+ state=blankState();
+ saveState();
+ render();
+ openSetup();
+ setupMessage.textContent="Fresh save created. Set your new starting point and final goals.";
+}
+resetBuildBtn.addEventListener("click",resetGame);
 settingsBtn.addEventListener("click",openSetup);navSettings.addEventListener("click",openSetup);menuBtn.addEventListener("click",openSetup);cancelSetup.addEventListener("click",closeSetup);saveSetup.addEventListener("click",saveBaseline);
 historyShortcut.addEventListener("click",()=>{historySection.classList.add("nav-open");scrollToId("historySection")});
 achShortcut.addEventListener("click",()=>{achSection.classList.add("nav-open");scrollToId("achSection")});
@@ -602,7 +622,7 @@ document.querySelectorAll(".nav-btn[data-target]").forEach(b=>b.addEventListener
 exportBtn.addEventListener("click",()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="health-power-save.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)});
 importBtn.addEventListener("click",()=>importFile.click());
 importFile.addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const o=JSON.parse(await f.text());if(!o.baseline||!o.pb||!Array.isArray(o.history))throw 0;state=o;saveState();render();message.textContent="Save imported."}catch{message.textContent="That save file isn't compatible."}});
-resetBtn.addEventListener("click",()=>{if(confirm("Reset all starting stats, PBs and history?")){state=blankState();saveState();render();openSetup()}});
+resetBtn.addEventListener("click",resetGame);
 date.value=new Date().toISOString().slice(0,10);
 render();if(!state.baseline)openSetup();
 </script>

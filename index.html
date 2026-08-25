@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Health & Power">
-<title>Health & Power RPG v13</title>
+<title>Health & Power RPG v14</title>
 <style>
 :root{
   --bg:#050505;--bg2:#090909;--panel:#0e0e0f;--panel2:#141415;--field:#080809;
@@ -115,7 +115,7 @@ h1,h2,h3,p{margin:0}
   box-shadow:0 0 38px rgba(255,255,255,.08)
 }
 
-.summary-strip{border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(3,1fr)}
+.summary-strip{display:none}
 .summary-cell{text-align:center;padding:9px 6px;position:relative}
 .summary-cell:not(:last-child):after{content:"";position:absolute;right:0;top:17%;bottom:17%;width:1px;background:#29292c}
 .summary-label{font-size:10px;color:var(--purple);letter-spacing:.14em;font-weight:950}
@@ -210,6 +210,168 @@ h1,h2,h3,p{margin:0}
 .character.max .delt{transform:scale(1.28) !important}
 .character.max .trap.l,.character.max .trap.r{transform:scale(1.22) !important}
 .character.max .leg{transform:scaleX(1.18) !important}
+
+
+/* v14 compact one-screen home layout */
+body{overscroll-behavior:none}
+.app{
+  padding-top:calc(5px + env(safe-area-inset-top));
+  padding-left:8px;padding-right:8px;
+  padding-bottom:calc(72px + env(safe-area-inset-bottom));
+}
+.physique-card{margin-top:4px;border-radius:19px}
+.physique-hud{padding:10px 12px 4px}
+.physique-title{font-size:10px;letter-spacing:.15em}
+.physique-rank{font-size:10px;margin-top:2px}
+.physique-weight{font-size:9px;color:#b7b7bc;margin-top:2px;font-weight:750}
+.physique-xp-number{font-size:12px}
+.physique-xp-next{font-size:8px}
+.physique-overall{padding:0 12px 6px}
+.physique-overall-line{font-size:9px;margin-bottom:4px}
+.physique-overall .bar{height:6px}
+
+.physique-main{
+  grid-template-columns:45% 55%;
+  min-height:222px;
+  height:222px;
+}
+.character-zone{
+  position:relative;
+  overflow:hidden !important;
+  padding:0;
+  align-items:center;
+  min-width:0;
+  border-radius:0 0 0 14px;
+}
+.character{
+  width:176px;height:226px;
+  transform:scale(.73);
+  transform-origin:center center;
+  margin:-2px -12px -2px -14px;
+}
+.stats-zone{padding:3px 8px 3px 0;gap:6px}
+.phys-row{grid-template-columns:25px 1fr;gap:5px}
+.phys-icon{width:25px;height:25px;border-radius:7px;font-size:12px}
+.phys-name,.phys-name b{font-size:9px}
+.phys-name{margin-bottom:4px}
+.phys-row .bar{height:6px}
+
+/* Logging becomes a compact control panel instead of the visual hero. */
+.log-card{margin-top:7px;padding:9px 10px;border-radius:18px}
+.log-top{gap:8px}
+.log-title{font-size:12px}
+.settings-btn{font-size:8px}
+.skill-status{font-size:9px;margin-top:3px;line-height:1.2}
+.form-grid{margin-top:7px;gap:5px}
+label{gap:3px;font-size:8px;letter-spacing:.05em}
+input,select{min-height:34px;height:34px;border-radius:9px;padding:4px 7px;font-size:16px}
+.readonly{min-height:34px;height:34px;border-radius:9px;padding:4px 6px}
+.readonly strong{font-size:13px}.readonly span{font-size:8px}
+.progress-date{gap:5px;margin-top:6px;grid-template-columns:1.3fr .7fr}
+.progress-box .top{font-size:8px;margin-bottom:4px}
+.progress-box .bar{height:6px}
+.until{font-size:8px;margin-top:3px}
+.claim{min-height:39px;height:39px;border-radius:11px;font-size:13px;margin-top:6px}
+.message{min-height:10px;margin-top:2px;font-size:8px;line-height:1.2}
+
+/* Bottom nav slightly shorter while retaining usable tap targets. */
+.bottom-nav{padding:4px 6px calc(4px + env(safe-area-inset-bottom))}
+.nav-btn{min-height:49px;font-size:9px;border-radius:11px}
+.nav-btn .ico{font-size:18px;margin-bottom:1px}
+
+/* Idle motion uses independent translate properties so it never breaks mobile scaling. */
+.character.idle{animation:idleFloatV14 2.8s ease-in-out infinite}
+.character.idle .body-avatar{animation:idleBreathV14 2.8s ease-in-out infinite}
+.character.idle .arm.l{animation:idleArmLV14 2.8s ease-in-out infinite}
+.character.idle .arm.r{animation:idleArmRV14 2.8s ease-in-out infinite}
+.character.idle .head{animation:idleHeadV14 4.2s ease-in-out infinite}
+.character.idle .aura{animation:idleAuraV14 2.8s ease-in-out infinite}
+@keyframes idleFloatV14{
+  0%,100%{translate:0 1px}
+  48%{translate:0 -5px}
+  55%{translate:0 -4px}
+}
+@keyframes idleBreathV14{
+  0%,100%{scale:1}
+  50%{scale:1.025 1.018}
+}
+@keyframes idleArmLV14{
+  0%,100%{translate:0 0}
+  50%{translate:-1px 2px}
+}
+@keyframes idleArmRV14{
+  0%,100%{translate:0 0}
+  50%{translate:1px 1px}
+}
+@keyframes idleHeadV14{
+  0%,42%,60%,100%{translate:0 0}
+  47%{translate:-1.5px 0}
+  52%{translate:1px 0}
+}
+@keyframes idleAuraV14{
+  0%,100%{opacity:.38;scale:.94}
+  50%{opacity:.72;scale:1.06}
+}
+
+/* Evolution is deliberately confined to the character viewport. */
+.character.evolving-inline{
+  animation:charChargeV14 1.25s ease-in-out;
+  z-index:5;
+}
+.character.evolving-inline:before,
+.character.evolving-inline:after{
+  box-shadow:
+    -54px -42px 0 #fff,50px -34px 0 #fff,-46px 50px 0 #fff,47px 56px 0 #fff,
+    -12px -66px 0 #fff,16px 69px 0 #fff;
+}
+.evo-badge{
+  left:50%;bottom:8px;max-width:92%;
+  overflow:hidden;text-overflow:ellipsis;
+  padding:6px 9px;font-size:8px;
+}
+@keyframes charChargeV14{
+  0%,100%{filter:none;scale:1}
+  22%{filter:brightness(1.7) contrast(1.25);scale:1.02}
+  42%{filter:brightness(0) invert(1);scale:.94}
+  60%{filter:brightness(3);scale:1.08}
+  76%{filter:none;scale:1.03}
+}
+.character.evolving-inline{animation-name:charChargeV14}
+.character.evolving-inline .body-avatar{animation:charMorphV14 1.25s cubic-bezier(.2,.8,.2,1)}
+@keyframes charMorphV14{
+  0%{scale:1}
+  40%{scale:.92}
+  64%{scale:1.12}
+  100%{scale:1}
+}
+
+/* Typical iPhone heights: keep the entire Home view above the nav. */
+@media(max-width:520px) and (max-height:900px){
+  .physique-main{height:214px;min-height:214px}
+  .character{transform:scale(.70);margin-top:-5px;margin-bottom:-5px}
+  .stats-zone{gap:5px}
+  .physique-hud{padding-top:8px}
+  .log-card{margin-top:6px;padding-top:8px;padding-bottom:8px}
+}
+@media(max-width:520px) and (max-height:820px){
+  .physique-main{height:198px;min-height:198px}
+  .character{transform:scale(.65)}
+  .physique-hud{padding:7px 10px 3px}
+  .physique-overall{padding:0 10px 5px}
+  .stats-zone{gap:4px}
+  .log-title{font-size:11px}
+  .skill-status{font-size:8px}
+  input,select,.readonly{height:32px;min-height:32px}
+  .claim{height:36px;min-height:36px}
+}
+
+/* When keyboard is closed, Home should not need vertical scrolling. */
+@media(max-width:520px){
+  #home{min-height:0}
+  .shortcuts{display:none}
+  #achSection,#historySection,#backupSection{display:none}
+  #achSection.nav-open,#historySection.nav-open,#backupSection.nav-open{display:block}
+}
 
 /* PB form */
 .log-card{margin-top:10px;padding:12px 13px}
@@ -381,7 +543,7 @@ input:focus,select:focus{border-color:#707078;box-shadow:0 0 0 3px rgba(255,255,
 </head>
 <body>
 
-<main class="app" id="home" data-version="13">
+<main class="app" id="home" data-version="14">
   
 
   <section class="card physique-card" id="statsSection">
@@ -389,6 +551,7 @@ input:focus,select:focus{border-color:#707078;box-shadow:0 0 0 3px rgba(255,255,
       <div>
         <div class="physique-title eyebrow">YOUR PHYSIQUE</div>
         <div class="physique-rank" id="physiqueRank">LVL 1 • ROOKIE</div>
+        <div class="physique-weight" id="physiqueWeight">— → — kg</div>
       </div>
       <div class="physique-xp">
         <div class="physique-xp-number" id="physiqueXp">⚡ 0 XP</div>
@@ -594,6 +757,7 @@ function render(){
  const s=score(),lvl=overallLevel(),st=stageFor(lvl),left=5-completed(),p=physique();
  applyChar(document.getElementById("mainCharacter"));renderPhysBars();
  document.getElementById("physiqueRank").textContent=`LVL ${lvl} • ${st[0]}`;
+ document.getElementById("physiqueWeight").textContent=state.pb.bw==null?"— → "+target("bw").toFixed(1)+" kg":`${Number(state.pb.bw).toFixed(1)} → ${target("bw").toFixed(1)} kg`;
  document.getElementById("physiqueXp").textContent=`⚡ ${s} XP`;
  const next=lvl===10?100:Math.min(100,lvl*12.5);
  document.getElementById("physiqueXpNext").textContent=lvl===10?"MAX LEVEL":Math.max(0,Math.round(next-s))+" XP to LVL "+(lvl+1);
@@ -648,7 +812,7 @@ function triggerEvolution(k,oldOverall,newOverall,oldSkill,newSkill,gain){
  ch.classList.remove("idle","evolving-inline");void ch.offsetWidth;ch.classList.add("evolving-inline");
  badge.textContent=newOverall===10?"FINAL FORM!":newOverall>oldOverall?`LEVEL ${newOverall} — ${stageFor(newOverall)[1]}`:`${copy[0]} • LVL ${newSkill}`;
  badge.classList.remove("show");void badge.offsetWidth;badge.classList.add("show");
- setTimeout(()=>{ch.classList.remove("evolving-inline");ch.classList.add("idle");applyChar(ch)},1350);
+ setTimeout(()=>{ch.classList.remove("evolving-inline");ch.classList.add("idle");applyChar(ch)},1500);
  if(navigator.vibrate) navigator.vibrate([40,35,70]);
 }
 function showToast(title,text){toastTitle.textContent=title;toastText.textContent=text;toast.classList.add("show");clearTimeout(window.tst);window.tst=setTimeout(()=>toast.classList.remove("show"),2200)}

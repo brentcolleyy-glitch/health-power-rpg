@@ -627,10 +627,15 @@ input:focus,select:focus{
 
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
-/* v27: balanced single-screen mobile layout — readable stats and a calmer avatar scale. */
+/* v28: viewport-fitted mobile layout with compact form controls. */
 @media(max-width:520px){
-  .app{padding:calc(3px + env(safe-area-inset-top)) 5px calc(4px + env(safe-area-inset-bottom))}
-  .physique-card{margin-top:0}
+  .app{
+    min-height:100dvh;
+    display:flex;
+    flex-direction:column;
+    padding:calc(3px + env(safe-area-inset-top)) 5px calc(4px + env(safe-area-inset-bottom));
+  }
+  .physique-card{margin-top:0;flex:0 0 auto}
   .physique-hud{padding:7px 9px 2px;gap:7px}
   .physique-title{font-size:12px}
   .physique-rank{font-size:10px;margin-top:2px}
@@ -640,7 +645,7 @@ input:focus,select:focus{
   .physique-overall{padding:3px 9px 6px}
   .physique-overall-line{font-size:8px;margin-bottom:3px}
   .physique-overall .bar{height:6px}
-  .physique-main{grid-template-columns:50% 50%;height:265px;min-height:265px}
+  .physique-main{grid-template-columns:50% 50%;height:clamp(285px,37dvh,325px);min-height:285px}
   .character-zone{padding:2px 0 12px}
   .character-zone:after{left:23%;right:23%;bottom:9px;height:7px}
   .sprite-canvas{width:min(94%,196px);height:auto;max-height:235px;aspect-ratio:4/5}
@@ -654,7 +659,7 @@ input:focus,select:focus{
   .summary-label{font-size:7px}
   .summary-value{font-size:12px;margin-top:2px}
   .summary-sub{font-size:7px;margin-top:2px}
-  .log-card{margin-top:4px;padding:7px 9px;border-radius:12px}
+  .log-card{margin-top:4px;padding:7px 9px;border-radius:12px;flex:1;display:flex;flex-direction:column}
   .log-title{font-size:11px}
   .settings-btn{font-size:8px;padding:2px}
   .skill-status{margin-top:4px;font-size:8px}
@@ -662,15 +667,17 @@ input:focus,select:focus{
   .form-grid .skill-field{grid-column:1/-1}
   .form-grid label:nth-child(4){grid-column:auto}
   label{gap:2px;font-size:7px}
-  input,select,.readonly{height:34px;min-height:34px;border-radius:7px;padding:4px 7px}
+  input,select,.readonly{height:30px;min-height:30px;border-radius:7px;padding:2px 6px}
+  .form-grid .skill-field select{height:32px;min-height:32px}
   select{font-size:16px}
   .readonly strong{font-size:13px}
-  .progress-date{grid-template-columns:1.15fr .85fr;gap:5px;margin-top:5px}
+  .progress-date{grid-template-columns:minmax(0,1fr) 132px;gap:6px;margin-top:auto;padding-top:8px}
+  #date{text-align:center;padding-left:3px;padding-right:3px}
   .progress-box .top{font-size:7px;margin-bottom:3px}
   .progress-box .bar{height:5px}
   .until{font-size:7px;margin-top:3px}
-  .claim{min-height:37px;margin-top:6px;font-size:12px}
-  .message{min-height:9px;margin-top:2px;font-size:7px}
+  .claim{min-height:35px;margin-top:6px;font-size:12px}
+  .message{min-height:7px;margin-top:2px;font-size:7px}
   .toast{bottom:calc(8px + env(safe-area-inset-bottom))}
 }
 
@@ -678,7 +685,7 @@ input:focus,select:focus{
 </head>
 <body>
 
-<main class="app" id="home" data-version="27">
+<main class="app" id="home" data-version="28">
   
 
   <section class="card physique-card" id="statsSection">

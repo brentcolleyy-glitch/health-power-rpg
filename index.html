@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Health & Power">
-<title>Health & Power RPG v19</title>
+<title>Health & Power RPG v20</title>
 <style>
 
 :root{
@@ -764,13 +764,106 @@ input:focus,select:focus{
     drop-shadow(0 8px 3px rgba(0,0,0,.65));
 }
 
+
+/* ===== v20 HANDCRAFTED SVG HERO ===== */
+.character{
+  width:100%!important;height:100%!important;margin:0!important;
+  transform:none!important;translate:none!important;
+  display:flex;align-items:center;justify-content:center;
+}
+.svg-stage{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;
+}
+.hero-svg{
+  --mass:0;--chest:0;--pull:0;--legs:0;--lean:0;--overall:0;
+  width:auto;height:97%;max-width:98%;overflow:visible;
+  filter:drop-shadow(0 9px 4px rgba(0,0,0,.62));
+}
+.hero-svg *{vector-effect:non-scaling-stroke}
+.hero-body{transform-origin:110px 250px;transform:scale(calc(.88 + var(--mass)*.05 + var(--overall)*.07))}
+.hero-aura{opacity:calc(.05 + var(--overall)*.62);transform-origin:110px 140px;transform:scale(calc(.84 + var(--overall)*.22))}
+.hero-sparks{fill:#c39cff;opacity:calc(var(--overall)*.9)}
+.character.max .hero-aura{fill:#ffc63d;opacity:.6;filter:url(#softGlow)}
+.character.max .hero-sparks{fill:#ffe37a}
+.character.max .hair-main,.character.max .hair-lock{fill:#f3c13d}
+
+.face,.ear,.neck,.torso-shape,.upper-arm,.forearm,.fist,.leg{fill:url(#skinGrad);stroke:#090a0e;stroke-width:3}
+.lat,.waist-shade,.trap{fill:url(#skinDarkGrad);stroke:#090a0e;stroke-width:2.2}
+.delt,.bicep,.pec{fill:#efa777;stroke:#090a0e;stroke-width:2.4}
+.pec-line,.quad-line,.short-seam,.nose,.mouth,.brow{fill:none;stroke:#7f4634;stroke-width:2;stroke-linecap:round}
+.brow{stroke:#241a18;stroke-width:3}
+.eye-socket{fill:#090a0e}
+.eye-white{fill:#fff}
+.iris{fill:#202328}
+.eye-shine{fill:#fff}
+.hair-main,.hair-lock{fill:#111319;stroke:#090a0e;stroke-width:3}
+.hero-shorts path{fill:url(#shortGrad);stroke:#090a0e;stroke-width:3}
+.shoe{fill:#ececee;stroke:#090a0e;stroke-width:3}
+.sole{fill:#353941}
+.hero-abs path{fill:#efaa7c;stroke:#8b503d;stroke-width:1.6}
+.hero-abs{opacity:calc(.10 + var(--lean)*.90)}
+.hero-veins{fill:none;stroke:#7a463c;stroke-width:1.5;stroke-linecap:round;opacity:calc(max(0,(var(--lean) - .50))*1.8)}
+.quad-line{opacity:calc(.10 + var(--legs)*.9)}
+.hero-back{transform-origin:110px 150px;transform:scaleX(calc(.68 + var(--pull)*.42 + var(--overall)*.04))}
+.hero-chest{transform-origin:110px 114px;transform:scale(calc(.72 + var(--chest)*.32 + var(--overall)*.03))}
+.hero-arms{transform-origin:110px 140px}
+.arm-left{transform-origin:77px 120px;transform:scaleX(calc(.72 + var(--pull)*.18 + var(--chest)*.11 + var(--overall)*.04))}
+.arm-right{transform-origin:143px 120px;transform:scaleX(calc(.72 + var(--pull)*.18 + var(--chest)*.11 + var(--overall)*.04))}
+.bicep{transform-box:fill-box;transform-origin:center;transform:scale(calc(.72 + var(--pull)*.34))}
+.delt{transform-box:fill-box;transform-origin:center;transform:scale(calc(.72 + var(--pull)*.12 + var(--chest)*.22))}
+.hero-legs{transform-origin:110px 190px;transform:scaleX(calc(.72 + var(--legs)*.28))}
+.hero-torso{transform-origin:110px 135px;transform:scaleX(calc(.86 + var(--chest)*.05 + var(--pull)*.07 - var(--lean)*.05))}
+.hero-head{transform-origin:110px 74px;transform:scale(calc(1.04 - var(--overall)*.04))}
+.hero-hair{transform-origin:110px 48px;transform:scale(calc(.96 + var(--overall)*.10))}
+.traps{transform-origin:110px 102px;transform:scaleX(calc(.72 + var(--pull)*.34))}
+.hero-shoes{transform-origin:110px 250px;transform:scaleX(calc(.92 + var(--legs)*.07))}
+
+.character.idle .hero-body{animation:svgBreath 2.8s ease-in-out infinite}
+.character.idle .hero-head{animation:svgHead 4.5s ease-in-out infinite}
+.character.idle .hero-aura{animation:svgAura 2.2s ease-in-out infinite}
+.character.idle .hero-sparks{animation:svgSpark 1.8s steps(2,end) infinite}
+@keyframes svgBreath{
+  0%,100%{translate:0 0}
+  50%{translate:0 -3px}
+}
+@keyframes svgHead{
+  0%,42%,60%,100%{rotate:0deg}
+  49%{rotate:-1.5deg}
+  55%{rotate:1deg}
+}
+@keyframes svgAura{
+  0%,100%{opacity:calc(.05 + var(--overall)*.52)}
+  50%{opacity:calc(.12 + var(--overall)*.72)}
+}
+@keyframes svgSpark{
+  0%,100%{opacity:.15}
+  50%{opacity:.9}
+}
+
+.character.evolving-inline .hero-svg{animation:svgEvolution 1.35s cubic-bezier(.2,.75,.25,1)}
+.character.evolving-inline .hero-aura{animation:svgAuraBurst 1.35s ease-out}
+@keyframes svgEvolution{
+  0%{filter:brightness(1);transform:scale(1)}
+  25%{filter:brightness(2.2);transform:scale(.96)}
+  45%{filter:brightness(0) invert(1);transform:scale(.92)}
+  62%{filter:brightness(3.5);transform:scale(1.08)}
+  82%{filter:none;transform:scale(1.12)}
+  100%{filter:none;transform:scale(1)}
+}
+@keyframes svgAuraBurst{
+  0%{opacity:.2;transform:scale(.9)}
+  55%{opacity:1;transform:scale(1.25)}
+  100%{opacity:.5;transform:scale(1)}
+}
+
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 </style>
 </head>
 <body>
 
-<main class="app" id="home" data-version="19">
+<main class="app" id="home" data-version="20">
   
 
   <section class="card physique-card" id="statsSection">
@@ -951,335 +1044,173 @@ function stageFor(l){if(l<=2)return["ROOKIE","The Rookie"];if(l<=4)return["TRAIN
 function physique(){return{mass:progress("bw",state.pb.bw),chest:progress("bench",state.pb.bench),pull:progress("pull",state.pb.pull),thick:progress("dead",state.pb.dead),lean:progress("run",state.pb.run)}}
 function isBetter(k,n){return state.pb[k]==null||n>Number(state.pb[k])}
 
-function charMarkup(){return `<div class="pixel-stage"><canvas class="sprite-canvas" width="192" height="256" aria-label="Evolving pixel character"></canvas></div>`}
+function charMarkup(){return `
+    <div class="svg-stage">
+      <svg class="hero-svg" viewBox="0 0 220 280" aria-label="Evolving hero character" role="img">
+        <defs>
+          <radialGradient id="auraGrad" cx="50%" cy="45%" r="55%">
+            <stop offset="0%" stop-color="#9d6cff" stop-opacity=".40"/>
+            <stop offset="55%" stop-color="#7d4dff" stop-opacity=".16"/>
+            <stop offset="100%" stop-color="#7d4dff" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="skinGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#f1aa7b"/>
+            <stop offset="100%" stop-color="#c97953"/>
+          </linearGradient>
+          <linearGradient id="skinDarkGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#d88a60"/>
+            <stop offset="100%" stop-color="#a85f44"/>
+          </linearGradient>
+          <linearGradient id="shortGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#21365f"/>
+            <stop offset="100%" stop-color="#101b35"/>
+          </linearGradient>
+          <filter id="softGlow" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="4" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <ellipse class="hero-aura" cx="110" cy="135" rx="88" ry="118" fill="url(#auraGrad)"/>
+        <g class="hero-sparks">
+          <circle cx="39" cy="72" r="2"/><circle cx="180" cy="82" r="2"/>
+          <circle cx="28" cy="142" r="2"/><circle cx="188" cy="150" r="2"/>
+          <circle cx="52" cy="210" r="2"/><circle cx="167" cy="216" r="2"/>
+        </g>
+
+        <g class="hero-body">
+          <!-- back/lat silhouette -->
+          <g class="hero-back">
+            <path class="lat lat-l" d="M78 102 C57 107 49 124 52 154 C55 175 69 186 84 183 L94 154 L94 112 Z"/>
+            <path class="lat lat-r" d="M142 102 C163 107 171 124 168 154 C165 175 151 186 136 183 L126 154 L126 112 Z"/>
+          </g>
+
+          <!-- legs -->
+          <g class="hero-legs">
+            <path class="leg leg-l" d="M84 187 C78 202 79 225 84 244 C88 251 100 251 104 244 L104 190 Z"/>
+            <path class="leg leg-r" d="M136 187 C142 202 141 225 136 244 C132 251 120 251 116 244 L116 190 Z"/>
+            <path class="quad-line ql" d="M92 198 C88 210 89 225 92 237"/>
+            <path class="quad-line qr" d="M128 198 C132 210 131 225 128 237"/>
+          </g>
+
+          <!-- torso -->
+          <g class="hero-torso">
+            <path class="torso-shape" d="M84 103 C93 96 127 96 136 103 C140 119 137 156 129 184 C121 191 99 191 91 184 C83 156 80 119 84 103 Z"/>
+            <path class="waist-shade" d="M94 161 C99 168 121 168 126 161 L124 181 C117 186 103 186 96 181 Z"/>
+            <g class="hero-chest">
+              <path class="pec pec-l" d="M88 111 C95 103 108 104 110 115 C108 126 92 128 86 120 Z"/>
+              <path class="pec pec-r" d="M132 111 C125 103 112 104 110 115 C112 126 128 128 134 120 Z"/>
+              <path class="pec-line" d="M110 107 L110 128"/>
+            </g>
+            <g class="hero-abs">
+              <path d="M101 132 C104 129 108 129 110 133 C108 138 103 139 100 136 Z"/>
+              <path d="M119 132 C116 129 112 129 110 133 C112 138 117 139 120 136 Z"/>
+              <path d="M101 143 C104 140 108 140 110 144 C108 149 103 150 100 147 Z"/>
+              <path d="M119 143 C116 140 112 140 110 144 C112 149 117 150 120 147 Z"/>
+              <path d="M102 154 C105 151 108 151 110 155 C108 160 104 161 101 158 Z"/>
+              <path d="M118 154 C115 151 112 151 110 155 C112 160 116 161 119 158 Z"/>
+            </g>
+            <g class="hero-veins">
+              <path d="M92 117 C87 124 87 132 84 139"/>
+              <path d="M128 117 C133 124 133 132 136 139"/>
+              <path d="M103 106 C101 112 100 117 97 122"/>
+            </g>
+          </g>
+
+          <!-- shoulders/arms -->
+          <g class="hero-arms">
+            <g class="arm-group arm-left">
+              <ellipse class="delt" cx="76" cy="113" rx="17" ry="16"/>
+              <path class="upper-arm" d="M66 122 C55 130 54 150 58 166 C61 177 71 182 79 176 C86 169 84 149 80 132 Z"/>
+              <ellipse class="bicep" cx="64" cy="142" rx="12" ry="15"/>
+              <path class="forearm" d="M59 158 C54 169 53 180 58 190 C63 197 73 195 76 187 C79 177 75 166 72 158 Z"/>
+              <path class="fist" d="M55 187 C50 192 51 203 58 207 C67 210 75 205 75 197 C74 189 62 184 55 187 Z"/>
+            </g>
+            <g class="arm-group arm-right">
+              <ellipse class="delt" cx="144" cy="113" rx="17" ry="16"/>
+              <path class="upper-arm" d="M154 122 C165 130 166 150 162 166 C159 177 149 182 141 176 C134 169 136 149 140 132 Z"/>
+              <ellipse class="bicep" cx="156" cy="142" rx="12" ry="15"/>
+              <path class="forearm" d="M161 158 C166 169 167 180 162 190 C157 197 147 195 144 187 C141 177 145 166 148 158 Z"/>
+              <path class="fist" d="M165 187 C170 192 169 203 162 207 C153 210 145 205 145 197 C146 189 158 184 165 187 Z"/>
+            </g>
+          </g>
+
+          <!-- neck -->
+          <path class="neck" d="M99 82 L121 82 L124 104 C117 110 103 110 96 104 Z"/>
+          <g class="traps">
+            <path class="trap trap-l" d="M98 94 C90 94 83 98 79 106 L93 110 L104 102 Z"/>
+            <path class="trap trap-r" d="M122 94 C130 94 137 98 141 106 L127 110 L116 102 Z"/>
+          </g>
+
+          <!-- head -->
+          <g class="hero-head">
+            <ellipse class="ear ear-l" cx="82" cy="67" rx="7" ry="11"/>
+            <ellipse class="ear ear-r" cx="138" cy="67" rx="7" ry="11"/>
+            <path class="face" d="M82 45 C91 32 129 32 138 45 L138 72 C133 90 122 98 110 98 C98 98 87 90 82 72 Z"/>
+            <g class="eyes">
+              <path class="eye-socket eye-l" d="M91 60 C96 55 103 55 107 60 C103 67 96 68 91 63 Z"/>
+              <path class="eye-socket eye-r" d="M129 60 C124 55 117 55 113 60 C117 67 124 68 129 63 Z"/>
+              <ellipse class="eye-white" cx="100" cy="61" rx="4.4" ry="5.3"/>
+              <ellipse class="eye-white" cx="120" cy="61" rx="4.4" ry="5.3"/>
+              <ellipse class="iris" cx="101" cy="62" rx="2.2" ry="2.8"/>
+              <ellipse class="iris" cx="119" cy="62" rx="2.2" ry="2.8"/>
+              <circle class="eye-shine" cx="100" cy="60.5" r="1"/>
+              <circle class="eye-shine" cx="118" cy="60.5" r="1"/>
+            </g>
+            <path class="brow brow-l" d="M91 54 C96 51 102 51 106 53"/>
+            <path class="brow brow-r" d="M129 54 C124 51 118 51 114 53"/>
+            <path class="nose" d="M110 64 L108 70 L112 70"/>
+            <path class="mouth" d="M102 79 C107 81 113 81 118 79"/>
+          </g>
+
+          <!-- hair -->
+          <g class="hero-hair">
+            <path class="hair-main" d="M81 48
+              C75 41 79 32 88 34
+              C83 25 92 19 99 25
+              C99 15 109 11 113 21
+              C119 11 128 18 125 27
+              C135 19 141 28 136 37
+              C145 35 148 44 139 50
+              C130 43 124 40 116 41
+              C106 36 95 40 81 48 Z"/>
+            <path class="hair-lock" d="M98 39 C104 34 111 34 115 41 C110 42 106 46 104 51 C102 46 100 42 98 39 Z"/>
+          </g>
+
+          <!-- shorts -->
+          <g class="hero-shorts">
+            <path d="M83 176 C91 181 129 181 137 176 L134 203 C126 207 118 205 110 201 C102 205 94 207 86 203 Z"/>
+            <path class="short-seam" d="M110 181 L110 201"/>
+          </g>
+
+          <!-- shoes -->
+          <g class="hero-shoes">
+            <path class="shoe shoe-l" d="M78 242 C82 238 100 238 104 243 L104 255 C96 258 80 258 76 253 Z"/>
+            <path class="shoe shoe-r" d="M142 242 C138 238 120 238 116 243 L116 255 C124 258 140 258 144 253 Z"/>
+            <path class="sole sole-l" d="M76 252 L104 252 L104 258 L76 258 Z"/>
+            <path class="sole sole-r" d="M116 252 L144 252 L144 258 L116 258 Z"/>
+          </g>
+        </g>
+      </svg>
+    </div>`}
 function applyChar(el){
  if(!el.dataset.built){el.innerHTML=charMarkup();el.dataset.built="1"}
- const canvas=el.querySelector(".sprite-canvas");
- drawSprite(canvas,physique(),score()/100,overallLevel(),0);
- el.classList.toggle("max",overallLevel()===10);
+ const p=physique(),svg=el.querySelector(".hero-svg");
+ const overall=score()/100,lvl=overallLevel();
+ svg.style.setProperty("--mass",p.mass.toFixed(3));
+ svg.style.setProperty("--chest",p.chest.toFixed(3));
+ svg.style.setProperty("--pull",p.pull.toFixed(3));
+ svg.style.setProperty("--legs",p.thick.toFixed(3));
+ svg.style.setProperty("--lean",p.lean.toFixed(3));
+ svg.style.setProperty("--overall",overall.toFixed(3));
+ svg.dataset.level=String(lvl);
+ el.classList.toggle("max",lvl===10);
 }
 
 function formatRaw(k,v){if(v==null)return"—";if(k==="run")return Number(v).toFixed(2);if(k==="pull")return Math.round(v);return Number(v).toFixed(1).replace(".0","")}
 function untilText(k){if(!state.baseline||state.pb[k]==null)return"Set your starting stats";const d=Math.max(0,target(k)-state.pb[k]);if(k==="run")return d.toFixed(2)+" km until goal";if(k==="pull")return Math.ceil(d)+" reps until goal";return d.toFixed(1).replace(".0","")+" kg until goal"}
 
 
-/* ===== PIXEL CHARACTER ENGINE =====
-   Native resolution is 96×128 and CSS scales it up with image-rendering: pixelated.
-   Each stat changes a different anatomical system rather than stretching one blob.
-*/
-function px(ctx,x,y,w,h,c){
-  ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));
-}
-function line(ctx,x1,y1,x2,y2,c,w=1){
-  ctx.strokeStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
-}
-function drawSprite(canvas,p,overall,level,frame=0){
-  if(!canvas)return;
-  const ctx=canvas.getContext("2d");
-  ctx.setTransform(2,0,0,2,0,0); // draw in 96×128 logical coordinates at 2× native resolution
-  ctx.clearRect(0,0,96,128);
-  ctx.imageSmoothingEnabled=true;
-
-  const C={
-    outline:"#090a0e", skin:"#d99363", skinHi:"#efa777", skinMid:"#c67b55", skinDark:"#8c503c",
-    hair:"#12141a", hairHi:"#2a2e37", shorts:"#142442", shortsHi:"#284064",
-    shoe:"#eeeeef", shoeMid:"#999da6", shoeDark:"#30333a",
-    aura:"#8e5cff", auraHi:"#cfadff", gold:"#ffc63d"
-  };
-
-  const chest=p.chest, pull=p.pull, legs=p.thick, lean=p.lean, mass=p.mass;
-  const stage=level>=10?5:level>=9?4:level>=7?3:level>=5?2:level>=3?1:0;
-  const bob=frame===1?-1:0;
-  const blink=frame===3;
-
-  function rr(x,y,w,h,r,c,stroke=null,sw=1){
-    ctx.beginPath();
-    ctx.roundRect(x,y,w,h,r);
-    ctx.fillStyle=c;ctx.fill();
-    if(stroke){ctx.lineWidth=sw;ctx.strokeStyle=stroke;ctx.stroke();}
-  }
-  function ellipse(x,y,rx,ry,c,stroke=null,sw=1){
-    ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);
-    ctx.fillStyle=c;ctx.fill();
-    if(stroke){ctx.lineWidth=sw;ctx.strokeStyle=stroke;ctx.stroke();}
-  }
-  function seg(x1,y1,x2,y2,c,w=1){
-    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);
-    ctx.strokeStyle=c;ctx.lineWidth=w;ctx.lineCap="round";ctx.stroke();
-  }
-
-  // Aura / sparks.
-  if(level>=7){
-    ctx.save();
-    ctx.globalAlpha=level===10?.80:.50;
-    const a1=level===10?C.gold:C.aura;
-    const a2=level===10?"#fff3b0":C.auraHi;
-    const flames=[[26,27,4,17],[66,29,4,15],[20,45,3,19],[73,48,3,18],[27,72,3,16],[67,70,3,16]];
-    flames.forEach(([x,y,w,h],i)=>{
-      rr(x,y+bob,w,h,1,i%2?a2:a1);
-    });
-    [[23,21],[72,23],[17,59],[79,57],[28,92],[68,95],[38,14],[58,13]].forEach(([x,y],i)=>{
-      ctx.fillStyle=i%2?a2:"#fff";ctx.fillRect(x,y+bob,1.5,1.5);
-      if(i<4){ctx.fillRect(x+.5,y-2+bob,.7,5);ctx.fillRect(x-2,y+.5+bob,5,.7);}
-    });
-    ctx.restore();
-  }
-
-  // Platform.
-  rr(18,113,60,4,2,"#3b344d");
-  rr(22,117,52,4,2,"#242334");
-  rr(27,121,42,3,1.5,"#11131b");
-  if(level>=7) rr(24,112,48,1.2,.6,level===10?C.gold:C.aura);
-
-  // Legs driven by Deadlift.
-  const thighW=6.8+legs*4.6+(stage>=3?.8:0);
-  const legGap=3;
-  const legTop=87+bob, legH=18;
-  rr(48-legGap-thighW-1,legTop-1,thighW+2,legH+2,3,C.outline);
-  rr(48+legGap-1,legTop-1,thighW+2,legH+2,3,C.outline);
-  rr(48-legGap-thighW,legTop,thighW,legH,2.4,C.skin);
-  rr(48+legGap,legTop,thighW,legH,2.4,C.skin);
-  if(legs>.35){
-    seg(39,91+bob,37.5,100+bob,C.skinDark,.9);
-    seg(57,91+bob,58.5,100+bob,C.skinDark,.9);
-  }
-  if(legs>.7){
-    seg(34.5,95+bob,41.5,95+bob,C.skinHi,.8);
-    seg(54.5,95+bob,61.5,95+bob,C.skinHi,.8);
-  }
-
-  // Shorts.
-  rr(28,78+bob,40,13,3,C.outline);
-  rr(30,79+bob,36,11,2.5,C.shorts);
-  seg(48,79+bob,48,90+bob,"#0b1327",1.2);
-  seg(34,82+bob,41,82+bob,C.shortsHi,.8);
-  seg(55,82+bob,62,82+bob,C.shortsHi,.8);
-
-  // Shoes.
-  rr(29,104+bob,16,8,2.5,C.outline);
-  rr(51,104+bob,16,8,2.5,C.outline);
-  rr(31,105+bob,13,5,1.8,C.shoe);
-  rr(52,105+bob,13,5,1.8,C.shoe);
-  rr(31,109+bob,13,2,1,C.shoeMid);
-  rr(52,109+bob,13,2,1,C.shoeMid);
-
-  // Heroic V taper.
-  const shoulderHalf=13.5+pull*6.7+chest*2.4+stage*.9;
-  const waistHalf=7.8+mass*1.1-lean*2.0;
-  const bodyTop=47+bob,bodyBottom=80+bob;
-
-  ctx.beginPath();
-  ctx.moveTo(48-shoulderHalf-2,bodyTop);
-  ctx.quadraticCurveTo(48-shoulderHalf-3,55+bob,48-waistHalf-2,bodyBottom);
-  ctx.lineTo(48+waistHalf+2,bodyBottom);
-  ctx.quadraticCurveTo(48+shoulderHalf+3,55+bob,48+shoulderHalf+2,bodyTop);
-  ctx.closePath();ctx.fillStyle=C.outline;ctx.fill();
-
-  ctx.beginPath();
-  ctx.moveTo(48-shoulderHalf,bodyTop+2);
-  ctx.quadraticCurveTo(48-shoulderHalf-1,57+bob,48-waistHalf,bodyBottom-1);
-  ctx.lineTo(48+waistHalf,bodyBottom-1);
-  ctx.quadraticCurveTo(48+shoulderHalf+1,57+bob,48+shoulderHalf,bodyTop+2);
-  ctx.closePath();ctx.fillStyle=C.skin;ctx.fill();
-
-  // Lat shadowing.
-  if(pull>.18){
-    ctx.globalAlpha=.22+.28*pull;
-    ctx.fillStyle=C.skinDark;
-    ctx.beginPath();
-    ctx.moveTo(48-shoulderHalf+1,bodyTop+6);
-    ctx.quadraticCurveTo(34,58+bob,39,bodyBottom-7);
-    ctx.lineTo(48-waistHalf,bodyBottom-1);ctx.closePath();ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(48+shoulderHalf-1,bodyTop+6);
-    ctx.quadraticCurveTo(62,58+bob,57,bodyBottom-7);
-    ctx.lineTo(48+waistHalf,bodyBottom-1);ctx.closePath();ctx.fill();
-    ctx.globalAlpha=1;
-  }
-
-  // Rounded pecs.
-  const pecW=7+chest*5.2+stage*.45;
-  const pecH=5+chest*3.0;
-  ellipse(47-pecW/2,54+bob,pecW/2,pecH/2,C.skinHi);
-  ellipse(49+pecW/2,54+bob,pecW/2,pecH/2,C.skinHi);
-  seg(48,51+bob,48,60+bob,C.skinDark,.9);
-  seg(35,59+bob,61,59+bob,C.skinDark,.9);
-
-  // Abs / obliques.
-  if(lean>.08||overall>.25){
-    ctx.globalAlpha=Math.min(1,.20+lean*.8+overall*.16);
-    seg(48,60+bob,48,77+bob,C.skinDark,.85);
-    const rows=lean>.68?3:lean>.28?2:1;
-    for(let i=0;i<rows;i++){
-      const y=64+i*5+bob;
-      rr(41.5,y-1.2,5.5,2.5,1.2,C.skinHi);
-      rr(49,y-1.2,5.5,2.5,1.2,C.skinHi);
-      seg(42,y+1,47,y+1,C.skinDark,.7);
-      seg(49,y+1,54,y+1,C.skinDark,.7);
-    }
-    ctx.globalAlpha=1;
-  }
-  if(lean>.45){
-    ctx.globalAlpha=(lean-.45)/.55*.65;
-    seg(39,65+bob,42,76+bob,C.skinDark,.8);
-    seg(57,65+bob,54,76+bob,C.skinDark,.8);
-    ctx.globalAlpha=1;
-  }
-
-  // Vascularity.
-  if(lean>.55){
-    ctx.globalAlpha=(lean-.55)/.45*.72;
-    seg(35,55+bob,31.5,63+bob,"#74483f",.75);
-    seg(61,55+bob,64.5,63+bob,"#74483f",.75);
-    seg(43,52+bob,40.5,58+bob,"#74483f",.75);
-    ctx.globalAlpha=1;
-  }
-
-  // Delts.
-  const deltR=3.6+(chest+pull)*1.7+stage*.3;
-  ellipse(48-shoulderHalf,53+bob,deltR,deltR*.95,C.outline);
-  ellipse(48+shoulderHalf,53+bob,deltR,deltR*.95,C.outline);
-  ellipse(48-shoulderHalf,53+bob,deltR-1,deltR*.95-1,C.skinHi);
-  ellipse(48+shoulderHalf,53+bob,deltR-1,deltR*.95-1,C.skinHi);
-
-  // Arms and biceps, rounded.
-  const armW=5+pull*3.0+chest*1.2+stage*.35;
-  const armX=48+shoulderHalf;
-  rr(48-shoulderHalf-armW-3,56+bob,armW+3,23,armW*.45,C.outline);
-  rr(armX,56+bob,armW+3,23,armW*.45,C.outline);
-  rr(49-shoulderHalf-armW-2,57+bob,armW,21,armW*.42,C.skin);
-  rr(armX+1,57+bob,armW,21,armW*.42,C.skin);
-
-  if(pull>.12){
-    const br=2.4+pull*2.7;
-    ellipse(48-shoulderHalf-armW-1,63+bob,br,5,C.skinHi);
-    ellipse(armX+armW+2,63+bob,br,5,C.skinHi);
-  }
-
-  // Fists.
-  rr(20,74+bob,8,8,2.5,C.outline);
-  rr(68,74+bob,8,8,2.5,C.outline);
-  rr(21.5,75+bob,5.5,5.5,2,C.skinHi);
-  rr(69,75+bob,5.5,5.5,2,C.skinHi);
-
-  if(lean>.7){
-    ctx.globalAlpha=(lean-.7)/.3;
-    seg(25,63+bob,23.5,72+bob,"#74483f",.7);
-    seg(71,63+bob,72.5,72+bob,"#74483f",.7);
-    ctx.globalAlpha=1;
-  }
-
-  // Neck and traps.
-  const neckW=7+pull*1.7;
-  rr(48-neckW/2-1,39+bob,neckW+2,10,2,C.outline);
-  rr(48-neckW/2,40+bob,neckW,9,1.5,C.skin);
-  if(pull>.2){
-    const trap=3+pull*4.2;
-    ctx.beginPath();
-    ctx.moveTo(48-neckW/2,44+bob);ctx.lineTo(37-trap,48+bob);ctx.lineTo(39,51+bob);ctx.closePath();
-    ctx.fillStyle=C.skinMid;ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(48+neckW/2,44+bob);ctx.lineTo(59+trap,48+bob);ctx.lineTo(57,51+bob);ctx.closePath();
-    ctx.fill();
-  }
-
-  // Rounded chibi head.
-  const headW=31-stage*.4,headH=29-stage*.3;
-  const hx=48-headW/2,hy=14+bob;
-  rr(hx-2,hy-2,headW+4,headH+4,8,C.outline);
-  rr(hx,hy,headW,headH,7,C.skin);
-  ctx.save();
-  ctx.globalAlpha=.7;
-  rr(hx+2,hy+2,headW-4,5,5,C.skinHi);
-  ctx.restore();
-  rr(hx,hy+headH-5,headW,5,0,C.skinMid);
-
-  // Ears.
-  ellipse(hx-1.5,hy+16,2.3,4,C.outline);ellipse(hx+headW+1.5,hy+16,2.3,4,C.outline);
-  ellipse(hx-1.2,hy+16,1.2,2.8,C.skin);ellipse(hx+headW+1.2,hy+16,1.2,2.8,C.skin);
-
-  // Eyes, softer rounded anime/chibi shape.
-  const eyeY=hy+13;
-  if(blink){
-    seg(hx+7,eyeY+2,hx+14,eyeY+2,C.outline,1.4);
-    seg(hx+headW-14,eyeY+2,hx+headW-7,eyeY+2,C.outline,1.4);
-  }else{
-    rr(hx+7,eyeY,7,6,2,C.outline);
-    rr(hx+headW-14,eyeY,7,6,2,C.outline);
-    ellipse(hx+10.5,eyeY+2.7,2.4,2.3,"#fff");
-    ellipse(hx+headW-10.5,eyeY+2.7,2.4,2.3,"#fff");
-    ellipse(hx+11.3,eyeY+3,1.3,1.5,"#202329");
-    ellipse(hx+headW-11.3,eyeY+3,1.3,1.5,"#202329");
-    ellipse(hx+10.8,eyeY+2.5,.45,.45,"#fff");
-    ellipse(hx+headW-10.8,eyeY+2.5,.45,.45,"#fff");
-  }
-
-  // Brows/expression.
-  const browY=hy+9;
-  if(stage>=2){
-    seg(hx+6,browY+1,hx+14,browY+3,C.outline,1.5);
-    seg(hx+headW-14,browY+3,hx+headW-6,browY+1,C.outline,1.5);
-  }else{
-    seg(hx+7,browY+2,hx+14,browY+2,"#4c3328",1);
-    seg(hx+headW-14,browY+2,hx+headW-7,browY+2,"#4c3328",1);
-  }
-  ellipse(48,hy+21,.7,.5,C.skinDark);
-  seg(44.5,hy+24,51.5,hy+24,"#5d352b",.9);
-
-  // Hair: smoother curved spikes, still retro/chibi.
-  const hairColor=level===10?C.gold:C.hair;
-  ctx.fillStyle=hairColor;
-  const cx=48,cy=17+bob;
-  const crownR=18+stage*.9;
-  const count=stage===0?8:stage===1?10:stage===2?12:stage===3?14:16;
-  ctx.beginPath();
-  let first=true;
-  for(let i=0;i<count;i++){
-    const t=i/(count-1);
-    const a=Math.PI+t*Math.PI;
-    const baseX=cx+Math.cos(a)*12.5;
-    const baseY=cy+Math.sin(a)*8;
-    const tipR=crownR+(i%3===0?3:0);
-    const tipX=cx+Math.cos(a)*tipR;
-    const tipY=cy+Math.sin(a)*tipR;
-    const nextA=a+Math.PI/count*.65;
-    const nextX=cx+Math.cos(nextA)*12;
-    const nextY=cy+Math.sin(nextA)*8;
-    if(first){ctx.moveTo(baseX,baseY);first=false;}
-    ctx.quadraticCurveTo(tipX,tipY,nextX,nextY);
-  }
-  ctx.lineTo(hx+headW-2,hy+7);
-  ctx.quadraticCurveTo(cx+10,hy-2,cx+5,hy+5);
-  ctx.quadraticCurveTo(cx,hy-1,cx-5,hy+5);
-  ctx.quadraticCurveTo(cx-10,hy-2,hx+2,hy+7);
-  ctx.closePath();ctx.fill();
-
-  // Hair highlight.
-  if(stage>=2){
-    ctx.save();ctx.globalAlpha=.38;
-    ctx.strokeStyle=level===10?"#fff0a0":C.hairHi;ctx.lineWidth=1.2;ctx.lineCap="round";
-    seg(39,8+bob,42,13+bob,ctx.strokeStyle,1.1);
-    seg(47,5+bob,48,12+bob,ctx.strokeStyle,1.1);
-    seg(56,8+bob,53,13+bob,ctx.strokeStyle,1.1);
-    ctx.restore();
-  }
-
-  if(level===10){
-    [[22,29],[73,36],[18,58],[76,66],[31,17],[65,15]].forEach(([x,y],i)=>{
-      ellipse(x,y+bob,1,1,i%2?C.gold:"#fff5b0");
-    });
-  }
-}
-
-let idleFrame=0;
-setInterval(()=>{
-  idleFrame=(idleFrame+1)%8;
-  const c=document.querySelector("#mainCharacter .sprite-canvas");
-  if(c && !document.getElementById("mainCharacter").classList.contains("evolving-inline")){
-    const spriteFrame = idleFrame===2 ? 1 : idleFrame===6 ? 3 : 0;
-    drawSprite(c,physique(),score()/100,overallLevel(),spriteFrame);
-  }
-},650);
 
 function renderPhysBars(){
   const p=physique();
@@ -1354,16 +1285,10 @@ function saveBaseline(){
 function evoCopy(k){return{bw:["MASS EVOLUTION","Frame evolved"],bench:["PUSH EVOLUTION","Chest evolved"],pull:["PULL EVOLUTION","Back & arms evolved"],dead:["POWER EVOLUTION","Thickness evolved"],run:["ENGINE EVOLUTION","Leanness evolved"]}[k]}
 function triggerEvolution(k,oldOverall,newOverall,oldSkill,newSkill,gain){
  const ch=document.getElementById("mainCharacter"),badge=document.getElementById("inlineEvoBadge"),copy=evoCopy(k);
- const canvas=ch.querySelector(".sprite-canvas");
  ch.classList.remove("idle","evolving-inline");void ch.offsetWidth;ch.classList.add("evolving-inline");
  badge.textContent=newOverall===10?"FINAL FORM!":newOverall>oldOverall?`LEVEL ${newOverall} — ${stageFor(newOverall)[1]}`:`${copy[0]} • LVL ${newSkill}`;
  badge.classList.remove("show");void badge.offsetWidth;badge.classList.add("show");
- if(canvas){
-   drawSprite(canvas,physique(),score()/100,newOverall,0);
-   setTimeout(()=>drawSprite(canvas,physique(),score()/100,newOverall,1),420);
-   setTimeout(()=>drawSprite(canvas,physique(),score()/100,newOverall,0),900);
- }
- setTimeout(()=>{ch.classList.remove("evolving-inline");ch.classList.add("idle");applyChar(ch)},1450);
+ setTimeout(()=>{ch.classList.remove("evolving-inline");ch.classList.add("idle");applyChar(ch)},1500);
  if(navigator.vibrate)navigator.vibrate([35,30,65]);
 }
 function showToast(title,text){toastTitle.textContent=title;toastText.textContent=text;toast.classList.add("show");clearTimeout(window.tst);window.tst=setTimeout(()=>toast.classList.remove("show"),2200)}

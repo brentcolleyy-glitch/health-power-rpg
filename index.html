@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Health & Power">
-<title>Health & Power RPG v17</title>
+<title>Health & Power RPG v18</title>
 <style>
 
 :root{
@@ -731,7 +731,7 @@ input:focus,select:focus{
 }
 .sprite-canvas{
   width:auto;
-  height:min(92%,252px);
+  height:min(96%,268px);
   max-width:94%;
   object-fit:contain;
   image-rendering:pixelated;
@@ -757,13 +757,21 @@ input:focus,select:focus{
   z-index:9;
 }
 
+
+.character.max .sprite-canvas{
+  filter:
+    drop-shadow(0 0 5px rgba(255,200,60,.28))
+    drop-shadow(0 0 12px rgba(255,180,30,.16))
+    drop-shadow(0 8px 3px rgba(0,0,0,.65));
+}
+
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 </style>
 </head>
 <body>
 
-<main class="app" id="home" data-version="17">
+<main class="app" id="home" data-version="18">
   
 
   <section class="card physique-card" id="statsSection">
@@ -972,183 +980,314 @@ function drawSprite(canvas,p,overall,level,frame=0){
   ctx.imageSmoothingEnabled=false;
   ctx.clearRect(0,0,96,128);
 
-  const skin="#d98f61",skinHi="#efa77a",skinDark="#a95e43",outline="#0b0c10";
-  const hair=level===10?"#f2c03d":"#14161b";
-  const shorts="#14233f",shoe="#e7e7ea",shoeDark="#4c5058";
-  const lean=p.lean, chest=p.chest, pull=p.pull, legs=p.thick, mass=p.mass;
+  const C={
+    outline:"#090a0e", skin:"#d99363", skinHi:"#f0a978", skinMid:"#c97d55", skinDark:"#8e503a",
+    hair:"#111319", hairHi:"#242832", shorts:"#142344", shortsHi:"#24385d",
+    shoe:"#e9e9ed", shoeMid:"#9a9da5", shoeDark:"#2b2e35",
+    aura:"#8d5cff", auraHi:"#c49aff", gold:"#ffc63d"
+  };
 
-  // Overall stage controls heroic posture and head/hair scale.
+  const chest=p.chest, pull=p.pull, legs=p.thick, lean=p.lean, mass=p.mass;
   const stage = level>=10?5:level>=9?4:level>=7?3:level>=5?2:level>=3?1:0;
   const bob = frame===1?-1:0;
+  const blink = frame===3;
 
-  // Aura at high levels.
+  // --- Aura / energy ---
   if(level>=7){
-    const auraC=level===10?"rgba(255,190,40,.30)":"rgba(157,90,255,.26)";
-    ctx.fillStyle=auraC;
-    for(let i=0;i<10;i++){
-      const ax=[26,67,20,74,30,64,16,80,39,55][i];
-      const ay=[32,30,48,52,75,74,91,88,20,18][i]+bob;
-      const ah=[10,13,8,9,12,10,7,7,8,10][i];
-      ctx.fillRect(ax,ay,2,ah);
-    }
+    ctx.save();
+    ctx.globalAlpha=level===10?.82:.55;
+    const auraMain = level===10 ? C.gold : C.aura;
+    const auraHi   = level===10 ? "#fff2a8" : C.auraHi;
+
+    // vertical energy tongues
+    const flames=[
+      [26,27,4,17],[66,29,4,15],[20,44,3,20],[73,48,3,18],
+      [27,71,3,17],[67,69,3,16],[18,84,2,12],[76,83,2,11]
+    ];
+    flames.forEach(([x,y,w,h],i)=>{
+      ctx.fillStyle=i%2?auraHi:auraMain;
+      ctx.fillRect(x,y+bob,w,h);
+    });
+
+    // spark pixels
+    const sparks=[[23,21],[72,23],[17,59],[79,57],[28,92],[68,95],[38,14],[58,13]];
+    sparks.forEach(([x,y],i)=>{
+      ctx.fillStyle=i%2?auraHi:"#ffffff";
+      ctx.fillRect(x,y+bob,2,2);
+      if(i<4){ctx.fillRect(x+1,y-2+bob,1,6);ctx.fillRect(x-2,y+1+bob,6,1);}
+    });
+    ctx.restore();
   }
 
-  // Ground/platform.
-  px(ctx,19,116,58,4,"#282533"); px(ctx,24,120,48,3,"#161820");
-  if(level>=7){px(ctx,25,115,46,1,level===10?"#ffbd2f":"#9b67ff")}
+  // --- Platform, closer to mockup ---
+  px(ctx,18,113,60,4,"#3b344d");
+  px(ctx,22,117,52,4,"#242334");
+  px(ctx,27,121,42,3,"#11131b");
+  if(level>=7){
+    px(ctx,24,112,48,1,level===10?C.gold:C.aura);
+    px(ctx,31,119,34,1,level===10?"#8a671f":"#554080");
+  }
 
-  // Legs: primarily Deadlift progression.
-  const thighW=7 + Math.round(legs*5) + (stage>=3?1:0);
-  const legGap=4;
-  const legY=88+bob;
-  px(ctx,48-legGap-thighW,legY,thighW,21,outline);
-  px(ctx,48+legGap,legY,thighW,21,outline);
-  px(ctx,49-legGap-thighW,legY+1,thighW-2,19,skin);
-  px(ctx,49+legGap,legY+1,thighW-2,19,skin);
-  // quad separation
-  if(legs>.35){ line(ctx,41,94+bob,39,104+bob,skinDark,1); line(ctx,55,94+bob,57,104+bob,skinDark,1); }
-  if(legs>.7){ line(ctx,35,99+bob,42,99+bob,skinHi,1); line(ctx,54,99+bob,61,99+bob,skinHi,1); }
+  // --- Compact heroic leg proportions ---
+  const legW = 7 + Math.round(legs*4) + (stage>=3?1:0);
+  const legGap=3;
+  const legTop=87+bob;
+  const legH=18;
+  px(ctx,48-legGap-legW-1,legTop-1,legW+2,legH+2,C.outline);
+  px(ctx,48+legGap-1,legTop-1,legW+2,legH+2,C.outline);
+  px(ctx,48-legGap-legW,legTop,legW,legH,C.skin);
+  px(ctx,48+legGap,legTop,legW,legH,C.skin);
+  if(legs>.35){
+    line(ctx,39,91+bob,37,100+bob,C.skinDark,1);
+    line(ctx,57,91+bob,59,100+bob,C.skinDark,1);
+  }
+  if(legs>.65){
+    line(ctx,34,95+bob,42,95+bob,C.skinHi,1);
+    line(ctx,54,95+bob,62,95+bob,C.skinHi,1);
+  }
 
-  // Shoes.
-  px(ctx,31,108+bob,14,7,outline); px(ctx,51,108+bob,14,7,outline);
-  px(ctx,33,109+bob,11,5,shoe); px(ctx,52,109+bob,11,5,shoe);
-  px(ctx,33,113+bob,11,2,shoeDark); px(ctx,52,113+bob,11,2,shoeDark);
+  // --- Shorts ---
+  px(ctx,28,78+bob,40,13,C.outline);
+  px(ctx,30,79+bob,36,11,C.shorts);
+  px(ctx,47,79+bob,2,11,"#0b1327");
+  px(ctx,33,81+bob,8,1,C.shortsHi);
+  px(ctx,55,81+bob,8,1,C.shortsHi);
+  line(ctx,36,82+bob,34,87+bob,"#0b1327",1);
+  line(ctx,60,82+bob,62,87+bob,"#0b1327",1);
 
-  // Shorts.
-  px(ctx,29,80+bob,38,13,outline);
-  px(ctx,31,81+bob,34,11,shorts);
-  px(ctx,47,81+bob,2,11,"#0b1428");
-  if(stage>=2){px(ctx,34,83+bob,5,1,"#263b62");px(ctx,56,83+bob,5,1,"#263b62")}
+  // --- Shoes ---
+  px(ctx,29,104+bob,16,8,C.outline); px(ctx,51,104+bob,16,8,C.outline);
+  px(ctx,31,105+bob,13,5,C.shoe);   px(ctx,52,105+bob,13,5,C.shoe);
+  px(ctx,31,109+bob,13,2,C.shoeMid);px(ctx,52,109+bob,13,2,C.shoeMid);
+  px(ctx,29,111+bob,16,2,C.shoeDark);px(ctx,51,111+bob,16,2,C.shoeDark);
 
-  // V-taper torso. Pull widens lats/shoulders, Zone2 narrows waist, mass modestly scales frame.
-  const shoulderHalf = 13 + pull*7 + chest*2 + stage*1.1;
-  const waistHalf = 8.5 + mass*1.5 - lean*2.3;
-  const torsoTop=48+bob, torsoBottom=82+bob;
+  // --- V-taper body ---
+  const shoulderHalf = 13.5 + pull*6.8 + chest*2.3 + stage*1.0;
+  const waistHalf = 7.8 + mass*1.2 - lean*2.0;
+  const bodyTop=47+bob, bodyBottom=80+bob;
 
-  // Lat silhouette polygon.
-  ctx.fillStyle=outline;
+  // outer silhouette
+  ctx.fillStyle=C.outline;
   ctx.beginPath();
-  ctx.moveTo(48-shoulderHalf-2,torsoTop);
-  ctx.lineTo(48+shoulderHalf+2,torsoTop);
-  ctx.lineTo(48+waistHalf+2,torsoBottom);
-  ctx.lineTo(48-waistHalf-2,torsoBottom);
+  ctx.moveTo(48-shoulderHalf-2,bodyTop);
+  ctx.lineTo(48+shoulderHalf+2,bodyTop);
+  ctx.lineTo(48+waistHalf+2,bodyBottom);
+  ctx.lineTo(48-waistHalf-2,bodyBottom);
   ctx.closePath();ctx.fill();
 
-  ctx.fillStyle=skin;
+  // skin
+  ctx.fillStyle=C.skin;
   ctx.beginPath();
-  ctx.moveTo(48-shoulderHalf,torsoTop+2);
-  ctx.lineTo(48+shoulderHalf,torsoTop+2);
-  ctx.lineTo(48+waistHalf,torsoBottom-1);
-  ctx.lineTo(48-waistHalf,torsoBottom-1);
+  ctx.moveTo(48-shoulderHalf,bodyTop+2);
+  ctx.lineTo(48+shoulderHalf,bodyTop+2);
+  ctx.lineTo(48+waistHalf,bodyBottom-1);
+  ctx.lineTo(48-waistHalf,bodyBottom-1);
   ctx.closePath();ctx.fill();
 
-  // Chest: Bench-specific.
-  const pecW=6 + chest*5 + stage*.5;
-  const pecH=4 + chest*3;
-  px(ctx,47-pecW,52+bob,pecW,pecH,skinHi);
-  px(ctx,49,52+bob,pecW,pecH,skinHi);
-  line(ctx,48,52+bob,48,60+bob,skinDark,1);
-  line(ctx,34,61+bob,62,61+bob,skinDark,1);
-
-  // Abs/definition controlled by Zone 2.
-  if(lean>.15){
-    const alpha=Math.min(1,.25+lean*.75);
-    ctx.globalAlpha=alpha;
-    line(ctx,48,62+bob,48,77+bob,skinDark,1);
-    if(lean>.3){line(ctx,42,66+bob,54,66+bob,skinDark,1);line(ctx,42,71+bob,54,71+bob,skinDark,1)}
-    if(lean>.65){line(ctx,43,76+bob,53,76+bob,skinDark,1)}
-    ctx.globalAlpha=1;
-  }
-
-  // Vascularity from Zone 2.
-  if(lean>.55){
-    ctx.globalAlpha=(lean-.55)/.45*.75;
-    line(ctx,37,57+bob,33,65+bob,"#7c4e42",1);
-    line(ctx,59,57+bob,63,65+bob,"#7c4e42",1);
-    line(ctx,44,54+bob,41,60+bob,"#7c4e42",1);
-    ctx.globalAlpha=1;
-  }
-
-  // Arms: Pull primarily biceps, Bench adds triceps/delts.
-  const armW=5 + pull*3 + chest*1.5 + stage*.5;
-  const armX=48+shoulderHalf;
-  px(ctx,48-shoulderHalf-armW-2,53+bob,armW+2,27,outline);
-  px(ctx,armX,53+bob,armW+2,27,outline);
-  px(ctx,49-shoulderHalf-armW,55+bob,armW-1,23,skin);
-  px(ctx,armX+1,55+bob,armW-1,23,skin);
-
-  // Biceps bump.
+  // lats / outer shading
   if(pull>.18){
-    const bump=2+Math.round(pull*3);
-    px(ctx,48-shoulderHalf-armW-bump+1,59+bob,bump,9,skinHi);
-    px(ctx,armX+armW,59+bob,bump,9,skinHi);
+    ctx.globalAlpha=.28+.35*pull;
+    ctx.fillStyle=C.skinDark;
+    ctx.beginPath();
+    ctx.moveTo(48-shoulderHalf+1,bodyTop+5);
+    ctx.lineTo(38,bodyTop+12);
+    ctx.lineTo(39,bodyBottom-8);
+    ctx.lineTo(48-waistHalf,bodyBottom-1);
+    ctx.closePath();ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(48+shoulderHalf-1,bodyTop+5);
+    ctx.lineTo(58,bodyTop+12);
+    ctx.lineTo(57,bodyBottom-8);
+    ctx.lineTo(48+waistHalf,bodyBottom-1);
+    ctx.closePath();ctx.fill();
+    ctx.globalAlpha=1;
   }
-  // shoulder caps
-  if(chest>.2 || pull>.2){
-    const d=3+Math.round((chest+pull)*2);
-    px(ctx,48-shoulderHalf-1,50+bob,d,7,skinHi);
-    px(ctx,48+shoulderHalf-d+1,50+bob,d,7,skinHi);
+
+  // --- Chest / pecs ---
+  const pecW=7+chest*5.2+stage*.5;
+  const pecH=5+chest*2.8;
+  ctx.fillStyle=C.skinHi;
+  ctx.beginPath();
+  ctx.roundRect(47-pecW,50+bob,pecW,pecH,2);ctx.fill();
+  ctx.beginPath();
+  ctx.roundRect(49,50+bob,pecW,pecH,2);ctx.fill();
+  line(ctx,48,50+bob,48,59+bob,C.skinDark,1);
+  line(ctx,35,59+bob,61,59+bob,C.skinDark,1);
+  if(chest>.55){
+    line(ctx,37,54+bob,45,55+bob,"#f5b086",1);
+    line(ctx,51,55+bob,59,54+bob,"#f5b086",1);
   }
-  // forearm veins from cardio
+
+  // --- Abs / conditioning ---
+  if(lean>.08 || overall>.25){
+    const alpha=Math.min(1,.22+lean*.78+overall*.18);
+    ctx.globalAlpha=alpha;
+    line(ctx,48,60+bob,48,77+bob,C.skinDark,1);
+    const absRows = lean>.68?3:lean>.28?2:1;
+    for(let i=0;i<absRows;i++){
+      const y=64+i*5+bob;
+      line(ctx,42,y,47,y,C.skinDark,1);
+      line(ctx,49,y,54,y,C.skinDark,1);
+      px(ctx,43,y-1,4,1,C.skinHi);
+      px(ctx,49,y-1,4,1,C.skinHi);
+    }
+    ctx.globalAlpha=1;
+  }
+
+  // oblique taper
+  if(lean>.45){
+    ctx.globalAlpha=(lean-.45)/.55*.7;
+    line(ctx,39,65+bob,42,76+bob,C.skinDark,1);
+    line(ctx,57,65+bob,54,76+bob,C.skinDark,1);
+    ctx.globalAlpha=1;
+  }
+
+  // vascularity
+  if(lean>.55){
+    ctx.globalAlpha=(lean-.55)/.45*.8;
+    line(ctx,35,55+bob,31,63+bob,"#74483f",1);
+    line(ctx,61,55+bob,65,63+bob,"#74483f",1);
+    line(ctx,43,52+bob,40,58+bob,"#74483f",1);
+    ctx.globalAlpha=1;
+  }
+
+  // --- Arms / shoulders ---
+  const deltSize=5+Math.round((chest+pull)*2.2)+stage*.4;
+  const armW=5+pull*3.1+chest*1.2+stage*.35;
+  const armX=48+shoulderHalf;
+
+  // delts
+  px(ctx,48-shoulderHalf-deltSize+1,49+bob,deltSize,9,C.outline);
+  px(ctx,48+shoulderHalf-1,49+bob,deltSize,9,C.outline);
+  px(ctx,48-shoulderHalf-deltSize+2,50+bob,deltSize-2,7,C.skinHi);
+  px(ctx,48+shoulderHalf,50+bob,deltSize-2,7,C.skinHi);
+
+  // arms
+  px(ctx,48-shoulderHalf-armW-3,56+bob,armW+3,23,C.outline);
+  px(ctx,armX,56+bob,armW+3,23,C.outline);
+  px(ctx,49-shoulderHalf-armW-2,57+bob,armW,21,C.skin);
+  px(ctx,armX+1,57+bob,armW,21,C.skin);
+
+  // biceps
+  if(pull>.12){
+    const bw=2+Math.round(pull*3.4);
+    px(ctx,48-shoulderHalf-armW-bw-1,59+bob,bw+2,10,C.skinHi);
+    px(ctx,armX+armW,59+bob,bw+2,10,C.skinHi);
+    line(ctx,48-shoulderHalf-armW-bw,67+bob,48-shoulderHalf-armW,67+bob,C.skinDark,1);
+    line(ctx,armX+armW,67+bob,armX+armW+bw,67+bob,C.skinDark,1);
+  }
+
   if(lean>.7){
     ctx.globalAlpha=(lean-.7)/.3;
-    line(ctx,25,69+bob,23,75+bob,"#7c4e42",1);
-    line(ctx,71,69+bob,73,75+bob,"#7c4e42",1);
+    line(ctx,25,63+bob,23,72+bob,"#74483f",1);
+    line(ctx,71,63+bob,73,72+bob,"#74483f",1);
     ctx.globalAlpha=1;
   }
 
-  // Neck and traps: Pull.
-  const neckW=7+pull*2;
-  px(ctx,48-neckW/2-1,40+bob,neckW+2,11,outline);
-  px(ctx,48-neckW/2,41+bob,neckW,10,skin);
-  if(pull>.25){
-    const trap=3+pull*4;
-    px(ctx,38-trap,45+bob,trap+5,7,skinDark);
-    px(ctx,53,45+bob,trap+5,7,skinDark);
+  // fists
+  px(ctx,20,75+bob,8,7,C.outline); px(ctx,68,75+bob,8,7,C.outline);
+  px(ctx,22,76+bob,5,5,C.skinHi); px(ctx,69,76+bob,5,5,C.skinHi);
+
+  // --- Neck / traps ---
+  const neckW=7+pull*1.8;
+  px(ctx,48-neckW/2-1,39+bob,neckW+2,10,C.outline);
+  px(ctx,48-neckW/2,40+bob,neckW,9,C.skin);
+  if(pull>.20){
+    const trap=3+pull*4.4;
+    px(ctx,37-trap,44+bob,trap+6,6,C.skinMid);
+    px(ctx,53,44+bob,trap+6,6,C.skinMid);
   }
 
-  // Head: oversized chibi, becomes slightly more heroic later.
-  const headW=28-stage*.7, headH=27-stage*.4;
-  px(ctx,48-headW/2-2,17+bob,headW+4,headH+4,outline);
-  px(ctx,48-headW/2,19+bob,headW,headH,skin);
-  px(ctx,48-headW/2,19+headH-4+bob,headW,4,"#c57953");
+  // --- Chibi head ---
+  const headW=31-stage*.5, headH=29-stage*.35;
+  const hx=48-headW/2, hy=14+bob;
+  ctx.fillStyle=C.outline;
+  ctx.beginPath();ctx.roundRect(hx-2,hy-2,headW+4,headH+4,7);ctx.fill();
+  ctx.fillStyle=C.skin;
+  ctx.beginPath();ctx.roundRect(hx,hy,headW,headH,6);ctx.fill();
+  px(ctx,hx,hy+headH-5,headW,5,C.skinMid);
 
-  // Eyes / expression.
-  const eyeY=31+bob;
-  px(ctx,39,eyeY,4,3,"#0b0c10");px(ctx,53,eyeY,4,3,"#0b0c10");
-  px(ctx,40,eyeY,1,1,"#fff");px(ctx,54,eyeY,1,1,"#fff");
-  if(stage>=2){ line(ctx,38,27+bob,43,28+bob,"#2b211b",1); line(ctx,53,28+bob,58,27+bob,"#2b211b",1); }
-  else { px(ctx,39,27+bob,4,1,"#4f3428");px(ctx,53,27+bob,4,1,"#4f3428"); }
-  px(ctx,45,39+bob,6,1,"#6f4032");
+  // ears
+  px(ctx,hx-3,hy+12,4,8,C.outline);px(ctx,hx+headW-1,hy+12,4,8,C.outline);
+  px(ctx,hx-2,hy+13,2,6,C.skin);px(ctx,hx+headW,hy+13,2,6,C.skin);
 
-  // Hair, increasingly spiky with overall level.
-  ctx.fillStyle=hair;
-  const spikes=stage===0?5:stage===1?7:stage===2?9:stage===3?11:13;
-  const radius=stage===0?17:20+stage*1.2;
-  const cx=48,cy=22+bob;
+  // Eyes: larger / more expressive
+  const eyeY=hy+13;
+  if(blink){
+    px(ctx,hx+7,eyeY+2,7,1,C.outline);
+    px(ctx,hx+headW-14,eyeY+2,7,1,C.outline);
+  }else{
+    px(ctx,hx+7,eyeY,7,6,C.outline);
+    px(ctx,hx+headW-14,eyeY,7,6,C.outline);
+    px(ctx,hx+8,eyeY+1,4,4,"#ffffff");
+    px(ctx,hx+headW-13,eyeY+1,4,4,"#ffffff");
+    px(ctx,hx+10,eyeY+2,3,3,"#23242a");
+    px(ctx,hx+headW-11,eyeY+2,3,3,"#23242a");
+    px(ctx,hx+10,eyeY+2,1,1,"#ffffff");
+    px(ctx,hx+headW-11,eyeY+2,1,1,"#ffffff");
+  }
+  // brows
+  const browY=hy+9;
+  if(stage>=2){
+    line(ctx,hx+6,browY+1,hx+14,browY+3,C.outline,2);
+    line(ctx,hx+headW-14,browY+3,hx+headW-6,browY+1,C.outline,2);
+  }else{
+    line(ctx,hx+7,browY+2,hx+14,browY+2,"#4c3328",1);
+    line(ctx,hx+headW-14,browY+2,hx+headW-7,browY+2,"#4c3328",1);
+  }
+  // nose + mouth
+  px(ctx,47,hy+21,2,1,C.skinDark);
+  px(ctx,44,hy+24,8,1,"#5d352b");
+
+  // --- Hair: dense multi-spike silhouette, much closer to mockup ---
+  ctx.fillStyle=level===10?C.gold:C.hair;
+  const hairCx=48, hairCy=17+bob;
+  const baseR=18+stage*.8;
+  const spikeCount=stage===0?9:stage===1?11:stage===2?13:stage===3?15:17;
   ctx.beginPath();
-  for(let i=0;i<spikes*2;i++){
-    const a=(-Math.PI)+(i/(spikes*2-1))*Math.PI;
-    const r=i%2===0?radius:11;
-    const x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r;
+  for(let i=0;i<spikeCount*2;i++){
+    const a=Math.PI + (i/(spikeCount*2-1))*Math.PI;
+    const r=i%2===0?baseR+(i%4===0?4:0):11;
+    const x=hairCx+Math.cos(a)*r;
+    const y=hairCy+Math.sin(a)*r;
     if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
   }
-  ctx.lineTo(cx+13,29+bob);ctx.lineTo(cx-13,29+bob);ctx.closePath();ctx.fill();
+  ctx.lineTo(hairCx+16,hy+8);
+  ctx.lineTo(hairCx+11,hy+1);
+  ctx.lineTo(hairCx+5,hy+6);
+  ctx.lineTo(hairCx,hy);
+  ctx.lineTo(hairCx-5,hy+6);
+  ctx.lineTo(hairCx-11,hy+1);
+  ctx.lineTo(hairCx-16,hy+8);
+  ctx.closePath();ctx.fill();
 
-  // Final-form highlights.
+  // hair highlights
+  if(stage>=2){
+    ctx.globalAlpha=.45;
+    ctx.fillStyle=level===10?"#fff0a0":C.hairHi;
+    px(ctx,38,9+bob,4,6,ctx.fillStyle);
+    px(ctx,45,5+bob,3,8,ctx.fillStyle);
+    px(ctx,53,7+bob,4,7,ctx.fillStyle);
+    ctx.globalAlpha=1;
+  }
+
+  // Final form glow / sparks
   if(level===10){
-    px(ctx,26,25+bob,2,2,"#ffd84c");px(ctx,68,34+bob,2,2,"#ffd84c");
-    px(ctx,20,57+bob,2,2,"#ffd84c");px(ctx,75,65+bob,2,2,"#ffd84c");
+    const sparks=[[22,29],[73,36],[18,58],[76,66],[31,17],[65,15]];
+    sparks.forEach(([x,y],i)=>{
+      ctx.fillStyle=i%2?C.gold:"#fff5b0";
+      px(ctx,x,y+bob,2,2,ctx.fillStyle);
+    });
   }
 }
 
 let idleFrame=0;
 setInterval(()=>{
-  idleFrame=(idleFrame+1)%4;
+  idleFrame=(idleFrame+1)%8;
   const c=document.querySelector("#mainCharacter .sprite-canvas");
   if(c && !document.getElementById("mainCharacter").classList.contains("evolving-inline")){
-    // two-frame breathing plus occasional blink frame
-    drawSprite(c,physique(),score()/100,overallLevel(),idleFrame===1?1:0);
+    const spriteFrame = idleFrame===2 ? 1 : idleFrame===6 ? 3 : 0;
+    drawSprite(c,physique(),score()/100,overallLevel(),spriteFrame);
   }
 },650);
 

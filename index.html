@@ -320,22 +320,6 @@ input:focus,select:focus{
 }
 .readonly strong{font-size:15px}
 .readonly span{font-size:8px;color:var(--muted)}
-.progress-date{
-  display:grid;
-  grid-template-columns:1.1fr .9fr;
-  gap:8px;
-  margin-top:10px;
-  align-items:end;
-}
-.progress-box .top{
-  display:flex;justify-content:space-between;gap:8px;
-  font-size:9px;font-weight:900;margin-bottom:6px
-}
-.until{
-  color:var(--green);
-  font-size:9px;
-  margin-top:6px;
-}
 .claim{
   width:100%;
   min-height:48px;
@@ -573,7 +557,6 @@ input:focus,select:focus{
   .log-title{font-size:13px}
   .form-grid{gap:6px}
   input,select,.readonly{height:39px;min-height:39px}
-  .progress-date{gap:6px}
   .claim{min-height:43px}
   #achSection,#historySection,#backupSection{display:none}
   #achSection.nav-open,#historySection.nav-open,#backupSection.nav-open{display:block}
@@ -586,7 +569,6 @@ input:focus,select:focus{
   .summary-value{font-size:13px}
   .form-grid{grid-template-columns:1fr 1fr}
   .form-grid label:nth-child(4){grid-column:1/-1}
-  .progress-date{grid-template-columns:1fr 1fr}
 }
 
 /* ===== v24 DIGIMON-STYLE PET ===== */
@@ -725,7 +707,7 @@ input:focus,select:focus{
   .summary-label{font-size:7px}
   .summary-value{font-size:12px;margin-top:2px}
   .summary-sub{font-size:7px;margin-top:2px}
-  .log-card{margin-top:4px;padding:7px 9px;border-radius:12px;flex:1;display:flex;flex-direction:column}
+  .log-card{margin-top:4px;padding:7px 9px;border-radius:12px;flex:1;min-height:0;display:flex;flex-direction:column}
   .log-title{font-size:11px}
   .settings-btn{font-size:8px;padding:2px}
   .skill-status{margin-top:4px;font-size:8px}
@@ -737,12 +719,7 @@ input:focus,select:focus{
   .form-grid .skill-field select{height:32px;min-height:32px}
   select{font-size:16px}
   .readonly strong{font-size:13px}
-  .progress-date{grid-template-columns:minmax(0,1fr) 132px;gap:6px;margin-top:auto;padding-top:8px}
-  #date{text-align:center;padding-left:3px;padding-right:3px}
-  .progress-box .top{font-size:7px;margin-bottom:3px}
-  .progress-box .bar{height:5px}
-  .until{font-size:7px;margin-top:3px}
-  .claim{min-height:35px;margin-top:6px;font-size:12px}
+  .claim{min-height:35px;margin-top:auto;font-size:12px}
   .message{min-height:7px;margin-top:2px;font-size:7px}
   .feed-panel{margin-top:6px;padding:5px 7px;border-radius:8px}
   .feed-title,.feed-level{font-size:8px}
@@ -759,7 +736,7 @@ input:focus,select:focus{
 </head>
 <body>
 
-<main class="app" id="home" data-version="32">
+<main class="app" id="home" data-version="33">
   
 
   <section class="card physique-card" id="statsSection">
@@ -837,17 +814,6 @@ input:focus,select:focus{
       </form>
       <div class="feed-footer"><span id="proteinToday">0 / 180 g today</span><span id="proteinStreak">🔥 0 day streak</span><span id="proteinMeals">0 meals</span></div>
     </section>
-
-    <div class="progress-date">
-      <div class="progress-box">
-        <div class="top"><span>PROGRESS</span><span id="skillPct">0%</span></div>
-        <div class="bar"><div class="fill" id="skillFill"></div></div>
-        <div class="until" id="untilGoal">Set your starting stats</div>
-      </div>
-      <label>DATE
-        <input id="date" type="date">
-      </label>
-    </div>
 
     <button class="claim" id="claimBtn" type="submit" form="pbForm">⚡ CLAIM XP</button>
     <div class="message" id="message" aria-live="polite"></div>
@@ -1161,10 +1127,6 @@ const petEngine={
 };
 
 function formatRaw(k,v){if(v==null)return"—";if(k==="run")return Number(v).toFixed(2);if(k==="pull")return Math.round(v);return Number(v).toFixed(1).replace(".0","")}
-function untilText(k){if(!state.baseline||state.pb[k]==null)return"Set your starting stats";const d=Math.max(0,target(k)-state.pb[k]);if(k==="run")return d.toFixed(2)+" km until goal";if(k==="pull")return Math.ceil(d)+" reps until goal";return d.toFixed(1).replace(".0","")+" kg until goal"}
-
-
-
 function renderPhysBars(){
   const p=physique(),proteinGoal=Number(state.proteinGoal)||180,proteinPct=clamp(proteinTotal()/proteinGoal,0,1);
   const rows=[
@@ -1227,8 +1189,6 @@ function updateSkill(){
  document.getElementById("skillStatus").innerHTML=`${g.icon} <b>${g.name}</b> • Skill LVL ${skillLevel(k)} • ${pct}% complete`;
  document.getElementById("currentPb").textContent=formatRaw(k,v);document.getElementById("currentUnit").textContent=g.unit;
  document.getElementById("goalPb").textContent=formatRaw(k,target(k));document.getElementById("goalUnit").textContent=g.unit;
- document.getElementById("skillPct").textContent=pct+"%";document.getElementById("skillFill").style.width=pct+"%";
- document.getElementById("untilGoal").textContent=untilText(k);
  const input=document.getElementById("value");input.step=k==="run"?"0.01":k==="pull"?"1":"0.1";input.placeholder=k==="run"?"4.20":k==="pull"?"5":"90";
 }
 function openSetup(){
@@ -1292,7 +1252,7 @@ pbForm.addEventListener("submit",e=>{
  if(raw===""||!Number.isFinite(n)||n<0){message.className="message";message.textContent="Enter a valid result.";return}
  if(!isBetter(k,n)){message.className="message";message.textContent=`Current PB is ${goals[k].format(state.pb[k])}. Beat it to claim XP.`;return}
  const oldScore=score(),oldSkill=skillLevel(k),oldOverall=overallLevel();state.pb[k]=n;
- const newScore=score(),newSkill=skillLevel(k),newOverall=overallLevel(),gain=Math.max(0,newScore-oldScore),d=date.value||new Date().toISOString().slice(0,10);
+ const newScore=score(),newSkill=skillLevel(k),newOverall=overallLevel(),gain=Math.max(0,newScore-oldScore),d=localDay();
  state.history.push({skill:k,value:n,date:d,xp:gain});render();value.value="";
  message.className="message success";message.textContent=`🎉 NEW PB! ${goals[k].format(n)} • +${gain} XP`;
  if(newSkill>oldSkill||newOverall>oldOverall)triggerEvolution(k,oldOverall,newOverall,oldSkill,newSkill,gain);else{triggerCelebration();showToast("NEW PB!",`${goals[k].format(n)} • +${gain} XP`)}
@@ -1323,7 +1283,6 @@ exportBtn.addEventListener("click",()=>{const blob=new Blob([JSON.stringify(stat
 importBtn.addEventListener("click",()=>importFile.click());
 importFile.addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const o=JSON.parse(await f.text());if(!o.baseline||!o.pb||!Array.isArray(o.history))throw 0;state=normaliseState(o);saveState();render();if(!state.name||!state.proteinGoal)openSetup();message.textContent="Save imported."}catch{message.textContent="That save file isn't compatible."}});
 resetBtn.addEventListener("click",resetGame);
-date.value=new Date().toISOString().slice(0,10);
 render();if(!state.baseline||!state.name||!state.proteinGoal)openSetup();
 const petEl=document.getElementById("mainCharacter");
 petEl.addEventListener("click",()=>petEngine.react());

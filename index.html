@@ -218,6 +218,8 @@ button{cursor:pointer}
 .phys-row.pull .fill{background:linear-gradient(90deg,#4b94e8,#68b1ff)}
 .phys-row.thick .fill{background:linear-gradient(90deg,#f18b20,#ffb744)}
 .phys-row.lean .fill{background:linear-gradient(90deg,#6bc53f,#9ade62)}
+.phys-row.protein .fill{background:linear-gradient(90deg,#ef941d,#ffd65f)}
+.phys-row.protein.complete .phys-icon{border-color:#9a7325;box-shadow:0 0 10px rgba(255,190,50,.2)}
 
 /* summary strip restored like mockup */
 .summary-strip{
@@ -519,6 +521,39 @@ input:focus,select:focus{
 }
 .toast-box strong{font-size:9px}.toast-box span{display:block;color:var(--muted);font-size:8px;margin-top:2px}
 
+/* full-screen daily protein level-up */
+.protein-celebration{
+  position:fixed;inset:0;z-index:220;display:grid;place-items:center;overflow:hidden;
+  visibility:hidden;opacity:0;pointer-events:none;
+  background:radial-gradient(circle at 50% 45%,rgba(255,190,56,.28),rgba(84,48,150,.25) 38%,rgba(3,5,8,.94) 76%);
+  backdrop-filter:blur(4px);
+}
+.protein-celebration.show{visibility:visible;animation:proteinScreen 2.9s ease-out both}
+.protein-celebration:before{
+  content:"";position:absolute;width:155vmax;height:155vmax;
+  background:repeating-conic-gradient(from 0deg,rgba(255,204,69,.22) 0 7deg,transparent 7deg 17deg);
+  animation:proteinRays 3s linear infinite;
+}
+.protein-celebration:after{
+  content:"";position:absolute;left:50%;top:49%;width:7px;height:7px;background:#ffd85a;
+  box-shadow:-130px -170px 0 #fff,125px -150px 0 #f1a7ff,-155px 25px 0 #ffb52c,150px 38px 0 #fff,-105px 170px 0 #b891ff,115px 155px 0 #ffca3a,-25px -210px 0 #fff,32px 205px 0 #fff;
+  animation:proteinSparks 1.45s steps(5,end) infinite;
+}
+.protein-celebration-card{position:relative;z-index:2;text-align:center;padding:26px 22px;transform:scale(.45);opacity:0}
+.protein-celebration.show .protein-celebration-card{animation:proteinCard 2.9s cubic-bezier(.2,.8,.25,1) both}
+.protein-celebration-avatar-wrap{position:relative;width:min(52vw,220px);margin:auto}
+.protein-celebration-avatar{display:block;width:100%;height:auto;aspect-ratio:4/5;filter:drop-shadow(0 0 18px rgba(255,196,55,.72)) drop-shadow(0 14px 5px rgba(0,0,0,.7))}
+.protein-celebration-icon{position:absolute;right:-8px;top:9%;font-size:48px;line-height:1;filter:drop-shadow(0 0 16px rgba(255,196,55,.8));animation:proteinIcon .55s steps(3,end) infinite alternate}
+.protein-celebration-kicker{margin-top:14px;color:#ffd45a;font-size:11px;font-weight:900;letter-spacing:.12em}
+.protein-celebration-level{margin-top:8px;color:#fff;font-size:clamp(27px,8vw,48px);font-weight:900;text-shadow:0 0 8px #7b4bd7,0 0 22px #ffb82f}
+.protein-celebration-copy{margin-top:7px;color:#c8a5ff;font-size:11px;font-weight:900}
+@keyframes proteinScreen{0%{opacity:0}10%,84%{opacity:1}100%{opacity:0}}
+@keyframes proteinRays{to{transform:rotate(360deg)}}
+@keyframes proteinSparks{0%{opacity:0;transform:translate(-50%,-50%) scale(.35)}30%,70%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6) rotate(24deg)}}
+@keyframes proteinCard{0%{opacity:0;transform:scale(.35) translateY(24px)}16%{opacity:1;transform:scale(1.12) translateY(0)}25%,78%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.08) translateY(-10px)}}
+@keyframes proteinIcon{from{transform:translateY(2px) rotate(-4deg)}to{transform:translateY(-4px) rotate(4deg)}}
+@media(prefers-reduced-motion:reduce){.protein-celebration.show{opacity:1}.protein-celebration.show .protein-celebration-card{opacity:1;transform:scale(1)}.protein-celebration:before,.protein-celebration:after{display:none}}
+
 /* mobile */
 @media(max-width:520px){
   .app{padding-left:6px;padding-right:6px}
@@ -724,7 +759,7 @@ input:focus,select:focus{
 </head>
 <body>
 
-<main class="app" id="home" data-version="31">
+<main class="app" id="home" data-version="32">
   
 
   <section class="card physique-card" id="statsSection">
@@ -796,7 +831,6 @@ input:focus,select:focus{
 
     <section class="feed-panel" id="feedPanel" aria-label="Daily protein feeding">
       <div class="feed-head"><div class="feed-title">🍗 DAILY PROTEIN</div><div class="feed-level" id="proteinLevel">PROTEIN LVL 1</div></div>
-      <div class="bar"><div class="fill" id="proteinFill"></div></div>
       <form class="feed-controls" id="feedForm">
         <input id="proteinAmount" type="number" inputmode="decimal" min="0.1" max="500" step="0.1" required aria-label="Protein grams" placeholder="Protein grams">
         <button class="feed-btn" type="submit">🍽 FEED</button>
@@ -882,6 +916,14 @@ input:focus,select:focus{
 </div>
 
 <div class="toast" id="toast"><div class="toast-box"><div style="font-size:26px">⚡</div><div><strong id="toastTitle">New PB!</strong><span id="toastText"></span></div></div></div>
+<div class="protein-celebration" id="proteinCelebration" aria-hidden="true" aria-live="polite">
+  <div class="protein-celebration-card">
+    <div class="protein-celebration-avatar-wrap"><canvas class="protein-celebration-avatar" id="proteinCelebrationAvatar" width="320" height="400" aria-hidden="true"></canvas><div class="protein-celebration-icon">🍗</div></div>
+    <div class="protein-celebration-kicker">DAILY GOAL COMPLETE</div>
+    <div class="protein-celebration-level" id="proteinCelebrationLevel">PROTEIN LVL 2</div>
+    <div class="protein-celebration-copy" id="proteinCelebrationCopy">FULLY FUELLED!</div>
+  </div>
+</div>
 
 <script>
 const defaultTargets={bw:90,bench:110,pull:8,dead:140,run:5};
@@ -1124,10 +1166,11 @@ function untilText(k){if(!state.baseline||state.pb[k]==null)return"Set your star
 
 
 function renderPhysBars(){
-  const p=physique();
+  const p=physique(),proteinGoal=Number(state.proteinGoal)||180,proteinPct=clamp(proteinTotal()/proteinGoal,0,1);
   const rows=[
     ["size","💪","Mass",p.mass],["chest","🫁","Bench Press",p.chest],["pull","🏋️","Pull-ups",p.pull],
-    ["thick","🛡️","Deadlift",p.thick],["lean","🍃","Zone 2 Cardio",p.lean]
+    ["thick","🛡️","Deadlift",p.thick],["lean","🍃","Zone 2 Cardio",p.lean],
+    ["protein"+(proteinPct>=1?" complete":""),"🍗",`Protein LVL ${proteinLevel()}`,proteinPct]
   ];
   document.getElementById("physiqueBars").innerHTML=rows.map(r=>`<div class="phys-row ${r[0]}"><div class="phys-icon">${r[1]}</div><div><div class="phys-name"><span>${r[2]}</span><b>${Math.round(r[3]*100)}%</b></div><div class="bar"><div class="fill" style="width:${Math.round(r[3]*100)}%"></div></div></div></div>`).join("");
 }
@@ -1141,9 +1184,8 @@ function renderHistory(){
  document.getElementById("history").innerHTML=rows.length?rows.map(h=>`<div class="history-row"><div><b>${goals[h.skill].icon} ${goals[h.skill].name}</b><small>${goals[h.skill].format(h.value)}</small></div><div class="history-right">+${h.xp??0} XP<br>${h.date}</div></div>`).join(""):`<div class="empty">No PBs logged yet.</div>`;
 }
 function renderProtein(){
- ensureProteinDay();const goal=Number(state.proteinGoal)||180,total=proteinTotal(),pct=clamp(total/goal,0,1),meals=state.protein.entries.length,streak=proteinStreak(),complete=total>=goal;
+ ensureProteinDay();const goal=Number(state.proteinGoal)||180,total=proteinTotal(),meals=state.protein.entries.length,streak=proteinStreak(),complete=total>=goal;
  document.getElementById("proteinLevel").textContent=`PROTEIN LVL ${proteinLevel()}`;
- document.getElementById("proteinFill").style.width=Math.round(pct*100)+"%";
  document.getElementById("proteinToday").textContent=`${Number(total.toFixed(1))} / ${Number(goal.toFixed(1))} g today`;
  document.getElementById("proteinToday").classList.toggle("protein-done",complete);
  document.getElementById("proteinStreak").textContent=`🔥 ${streak} day${streak===1?"":"s"}`;
@@ -1155,9 +1197,9 @@ function logProtein(event){
  if(!Number.isFinite(grams)||grams<=0||grams>500){message.className="message";message.textContent="Enter protein between 0.1 and 500 grams.";return}
  state.protein.entries.push({grams:Math.round(grams*10)/10,at:new Date().toISOString()});
  const leveled=completeProteinDay(),total=proteinTotal(),goal=Number(state.proteinGoal)||180;
- input.value="";saveState();renderProtein();petEngine.feed(leveled);
+ input.value="";saveState();renderProtein();renderPhysBars();petEngine.feed(leveled);
  message.className="message success";message.textContent=leveled?`🍗 Daily goal hit — Protein Level ${proteinLevel()}!`:`🍗 ${Number(grams.toFixed(1))} g fed to ${state.name||"your hero"}.`;
- showToast(leveled?`PROTEIN LVL ${proteinLevel()}!`:"PROTEIN FED",`${Number(total.toFixed(1))} / ${Number(goal.toFixed(1))} g today`);
+ if(leveled)showProteinCelebration();else showToast("PROTEIN FED",`${Number(total.toFixed(1))} / ${Number(goal.toFixed(1))} g today`);
 }
 function render(){
  const s=score(),lvl=overallLevel(),st=stageFor(lvl),left=5-completed(),p=physique();
@@ -1233,6 +1275,14 @@ function triggerEvolution(k,oldOverall,newOverall,oldSkill,newSkill,gain){
 }
 function triggerCelebration(){petEngine.celebrate();if(navigator.vibrate)navigator.vibrate(35)}
 function showToast(title,text){toastTitle.textContent=title;toastText.textContent=text;toast.classList.add("show");clearTimeout(window.tst);window.tst=setTimeout(()=>toast.classList.remove("show"),2200)}
+function showProteinCelebration(){
+ const overlay=document.getElementById("proteinCelebration");
+ const avatar=document.getElementById("proteinCelebrationAvatar");avatar.dataset.form=String(spriteFormForLevel(overallLevel()));avatar.dataset.frame=String(PET_FRAME.flex);drawSprite(avatar);
+ document.getElementById("proteinCelebrationLevel").textContent=`PROTEIN LVL ${proteinLevel()}`;
+ document.getElementById("proteinCelebrationCopy").textContent=`${(state.name||"YOUR HERO").toUpperCase()} IS FULLY FUELLED!`;
+ clearTimeout(window.proteinCelebrationTimer);overlay.classList.remove("show");void overlay.offsetWidth;overlay.classList.add("show");overlay.setAttribute("aria-hidden","false");
+ window.proteinCelebrationTimer=setTimeout(()=>{overlay.classList.remove("show");overlay.setAttribute("aria-hidden","true")},2950);
+}
 function scrollToId(id){document.getElementById(id).scrollIntoView({behavior:"smooth",block:"start"})}
 
 skill.addEventListener("change",updateSkill);
@@ -1278,8 +1328,8 @@ render();if(!state.baseline||!state.name||!state.proteinGoal)openSetup();
 const petEl=document.getElementById("mainCharacter");
 petEl.addEventListener("click",()=>petEngine.react());
 petEl.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();petEngine.react()}});
-document.addEventListener("visibilitychange",()=>{if(document.hidden)petEngine.clearTimers();else{const oldDay=state.protein?.date;ensureProteinDay();if(oldDay!==state.protein.date){renderProtein();saveState()}petEngine.lastInteraction=Date.now();petEngine.finish(900)}});
-setInterval(()=>{const oldDay=state.protein?.date;ensureProteinDay();if(oldDay!==state.protein.date){renderProtein();saveState()}},60000);
+document.addEventListener("visibilitychange",()=>{if(document.hidden)petEngine.clearTimers();else{const oldDay=state.protein?.date;ensureProteinDay();if(oldDay!==state.protein.date){renderProtein();renderPhysBars();saveState()}petEngine.lastInteraction=Date.now();petEngine.finish(900)}});
+setInterval(()=>{const oldDay=state.protein?.date;ensureProteinDay();if(oldDay!==state.protein.date){renderProtein();renderPhysBars();saveState()}},60000);
 petEngine.start();
 </script>
 </body>

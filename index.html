@@ -99,6 +99,10 @@ button{cursor:pointer}
   color:#fff;
   font-size:15px;
   letter-spacing:.06em;
+  max-width:210px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }
 .physique-title:before{content:"✦ ";color:var(--gold)}
 .physique-title:after{content:" ✦";color:var(--gold)}
@@ -425,6 +429,7 @@ input:focus,select:focus{
 .setup-grid{display:grid;gap:8px;margin-top:12px}
 .setup-row{border:1px solid #2f343d;border-radius:10px;padding:9px;background:#07090d}
 .setup-row-title{font-size:10px;font-weight:900;margin-bottom:7px}
+.setup-name input{text-align:left;text-transform:none}
 .setup-pair{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .setup-pair label{font-size:8px}
 .setup-actions{display:flex;gap:7px;margin-top:10px}
@@ -637,7 +642,7 @@ input:focus,select:focus{
   }
   .physique-card{margin-top:0;flex:0 0 auto}
   .physique-hud{padding:7px 9px 2px;gap:7px}
-  .physique-title{font-size:12px}
+  .physique-title{font-size:12px;max-width:170px}
   .physique-rank{font-size:10px;margin-top:2px}
   .physique-weight{font-size:8px;margin-top:2px}
   .physique-xp-number{font-size:12px}
@@ -685,13 +690,13 @@ input:focus,select:focus{
 </head>
 <body>
 
-<main class="app" id="home" data-version="29">
+<main class="app" id="home" data-version="30">
   
 
   <section class="card physique-card" id="statsSection">
     <div class="physique-hud">
       <div>
-        <div class="physique-title eyebrow">YOUR PHYSIQUE</div>
+        <div class="physique-title eyebrow" id="physiqueTitle">HERO</div>
         <div class="physique-rank" id="physiqueRank">LVL 1 • ROOKIE</div>
         <div class="physique-weight" id="physiqueWeight">— → — kg</div>
       </div>
@@ -801,8 +806,9 @@ input:focus,select:focus{
   <div class="sheet">
     <div class="eyebrow">CREATE YOUR 2026 BUILD</div>
     <h2>Choose your start & final form</h2>
-    <p>Set what you can genuinely do today, then choose the end-of-year target for each stat. Every level represents real progress between those two points.</p>
+    <p>Name your character, set what you can genuinely do today, then choose the end-of-year target for each stat. Every level represents real progress between those two points.</p>
     <form id="setupForm" class="setup-grid">
+      <div class="setup-row setup-name"><label>YOUR NAME<input id="playerName" type="text" required maxlength="18" autocomplete="name" autocapitalize="words" placeholder="Brent"></label></div>
       <div class="setup-row"><div class="setup-row-title">⚖️ Morning bodyweight</div><div class="setup-pair">
         <label>START<input inputmode="decimal" id="startBw" type="number" step="0.1" required placeholder="85.0"></label>
         <label>END GOAL<input inputmode="decimal" id="goalBw" type="number" step="0.1" required placeholder="90.0"></label>
@@ -845,8 +851,10 @@ function target(k){return Number(state.targets?.[k] ?? defaultTargets[k])}
 const keys=Object.keys(goals),STORE="healthPowerRPG";
 let state=loadState();
 
-function blankState(){return{version:4,baseline:null,targets:{...defaultTargets},pb:{bw:null,bench:null,pull:null,dead:null,run:null},history:[]}}
-function loadState(){try{const s=JSON.parse(localStorage.getItem(STORE));if(!s)return blankState();return{version:4,baseline:s.baseline||null,targets:{...defaultTargets,...(s.targets||{})},pb:{bw:s.pb?.bw??null,bench:s.pb?.bench??null,pull:s.pb?.pull??null,dead:s.pb?.dead??null,run:s.pb?.run??null},history:Array.isArray(s.history)?s.history:[]}}catch(e){return blankState()}}
+function normaliseName(value){return String(value||"").replace(/\s+/g," ").trim().slice(0,18)}
+function blankState(){return{version:5,name:"",baseline:null,targets:{...defaultTargets},pb:{bw:null,bench:null,pull:null,dead:null,run:null},history:[]}}
+function normaliseState(s){return{version:5,name:normaliseName(s?.name),baseline:s?.baseline||null,targets:{...defaultTargets,...(s?.targets||{})},pb:{bw:s?.pb?.bw??null,bench:s?.pb?.bench??null,pull:s?.pb?.pull??null,dead:s?.pb?.dead??null,run:s?.pb?.run??null},history:Array.isArray(s?.history)?s.history:[]}}
+function loadState(){try{const s=JSON.parse(localStorage.getItem(STORE));return s?normaliseState(s):blankState()}catch(e){return blankState()}}
 function saveState(){localStorage.setItem(STORE,JSON.stringify(state))}
 function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
 function progress(k,v){if(!state.baseline||v==null)return 0;const b=Number(state.baseline[k]),t=target(k);if(t<=b)return v>=t?1:0;return clamp((Number(v)-b)/(t-b),0,1)}
@@ -1062,6 +1070,7 @@ function renderHistory(){
 function render(){
  const s=score(),lvl=overallLevel(),st=stageFor(lvl),left=5-completed(),p=physique();
  applyChar(document.getElementById("mainCharacter"));renderPhysBars();
+ document.getElementById("physiqueTitle").textContent=state.name||"HERO";
  document.getElementById("physiqueRank").textContent=`LVL ${lvl} • ${st[0]}`;
  document.getElementById("physiqueWeight").textContent=state.pb.bw==null?"— → "+target("bw").toFixed(1)+" kg":`${Number(state.pb.bw).toFixed(1)} → ${target("bw").toFixed(1)} kg`;
  document.getElementById("physiqueXp").textContent=`⚡ ${s} XP`;
@@ -1089,6 +1098,7 @@ function updateSkill(){
 }
 function openSetup(){
  const m=document.getElementById("setupModal");m.classList.add("open");m.setAttribute("aria-hidden","false");
+ document.getElementById("playerName").value=state.name||"";
  ["bw","bench","pull","dead","run"].forEach(k=>{
    const cap=k[0].toUpperCase()+k.slice(1);
    const startEl=document.getElementById("start"+cap);
@@ -1103,14 +1113,16 @@ function openSetup(){
 }
 function closeSetup(){document.getElementById("setupModal").classList.remove("open")}
 function saveBaseline(){
+ const name=normaliseName(document.getElementById("playerName").value);
+ if(!name){setupMessage.textContent="Enter your name to create your character.";return}
  const vals={bw:Number(startBw.value),bench:Number(startBench.value),pull:Number(startPull.value),dead:Number(startDead.value),run:Number(startRun.value)};
  const targets={bw:Number(goalBw.value),bench:Number(goalBench.value),pull:Number(goalPull.value),dead:Number(goalDead.value),run:Number(goalRun.value)};
  if(keys.some(k=>!Number.isFinite(vals[k])||!Number.isFinite(targets[k])||targets[k]<=vals[k])){
    setupMessage.textContent="Each goal must be higher than its starting point.";return;
  }
- const first=!state.baseline;state.baseline=vals;state.targets=targets;
+ const first=!state.baseline;state.name=name;state.baseline=vals;state.targets=targets;
  if(first){state.pb={...vals};state.history=[]}
- saveState();closeSetup();render();message.textContent=first?"Character created. Your journey starts at 0 XP.":"Starting points and goals updated.";
+ saveState();closeSetup();render();message.textContent=first?`${name}'s journey starts at 0 XP.`:"Name, starting points and goals updated.";
 }
 function evoCopy(k){return{bw:["MASS EVOLUTION","Frame evolved"],bench:["PUSH EVOLUTION","Chest evolved"],pull:["PULL EVOLUTION","Back & arms evolved"],dead:["POWER EVOLUTION","Thickness evolved"],run:["ENGINE EVOLUTION","Leanness evolved"]}[k]}
 function triggerEvolution(k,oldOverall,newOverall,oldSkill,newSkill,gain){
@@ -1161,10 +1173,10 @@ document.querySelectorAll(".nav-btn[data-target]").forEach(b=>b.addEventListener
 }));
 exportBtn.addEventListener("click",()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="health-power-save.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)});
 importBtn.addEventListener("click",()=>importFile.click());
-importFile.addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const o=JSON.parse(await f.text());if(!o.baseline||!o.pb||!Array.isArray(o.history))throw 0;state=o;saveState();render();message.textContent="Save imported."}catch{message.textContent="That save file isn't compatible."}});
+importFile.addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const o=JSON.parse(await f.text());if(!o.baseline||!o.pb||!Array.isArray(o.history))throw 0;state=normaliseState(o);saveState();render();message.textContent="Save imported."}catch{message.textContent="That save file isn't compatible."}});
 resetBtn.addEventListener("click",resetGame);
 date.value=new Date().toISOString().slice(0,10);
-render();if(!state.baseline)openSetup();
+render();if(!state.baseline||!state.name)openSetup();
 const petEl=document.getElementById("mainCharacter");
 petEl.addEventListener("click",()=>petEngine.react());
 petEl.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();petEngine.react()}});

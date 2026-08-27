@@ -745,7 +745,7 @@ input:focus,select:focus{
 </head>
 <body>
 
-<main class="app" id="home" data-version="34">
+<main class="app" id="home" data-version="35">
   
 
   <section class="card physique-card" id="statsSection">
@@ -792,16 +792,16 @@ input:focus,select:focus{
       <div class="log-title">LOG A NEW PB</div>
       <button class="settings-btn" id="settingsBtn" type="button">Starting stats ⚙️</button>
     </div>
-    <div class="skill-status" id="skillStatus">💪 <b>Mass</b> • Skill LVL 1 • 0% complete</div>
+    <div class="skill-status" id="skillStatus">⚖️ <b>Mass</b> • Skill LVL 1 • 0% complete</div>
 
     <form id="pbForm" class="form-grid">
       <label class="skill-field">SKILL
         <select id="skill">
-          <option value="bw">💪 Mass — Morning BW</option>
-          <option value="bench">🫁 Push — Bench × 5</option>
+          <option value="bw">⚖️ Mass — Morning BW</option>
+          <option value="bench">🏋️ Push — Bench × 5</option>
           <option value="pull">🧗 Pull — Strict Pull-ups</option>
-          <option value="dead">🛡️ Power — Deadlift × 3</option>
-          <option value="run">🍃 Engine — 40 min Zone 2 distance</option>
+          <option value="dead">🦵 Power — Deadlift × 3</option>
+          <option value="run">🫀 Engine — 40 min Zone 2 distance</option>
         </select>
       </label>
       <label>NEW PB
@@ -862,12 +862,12 @@ input:focus,select:focus{
     <p>Name your character, set what you can genuinely do today, then choose the end-of-year target for each stat. Every level represents real progress between those two points.</p>
     <form id="setupForm" class="setup-grid">
       <div class="setup-row setup-name"><label>YOUR NAME<input id="playerName" type="text" required maxlength="18" autocomplete="name" autocapitalize="words" placeholder="Brent"></label></div>
-      <div class="setup-row"><div class="setup-row-title">🍗 Daily protein target</div><label>GRAMS PER DAY<input inputmode="decimal" id="proteinGoal" type="number" min="1" max="500" step="1" required placeholder="180"></label></div>
+      <div class="setup-row"><div class="setup-row-title">🍗 Daily protein target</div><label>GRAMS PER DAY<select id="proteinGoal" required aria-label="Daily protein target"></select></label></div>
       <div class="setup-row"><div class="setup-row-title">⚖️ Morning bodyweight</div><div class="setup-pair">
         <label>START<input inputmode="decimal" id="startBw" type="number" step="0.1" required placeholder="85.0"></label>
         <label>END GOAL<input inputmode="decimal" id="goalBw" type="number" step="0.1" required placeholder="90.0"></label>
       </div></div>
-      <div class="setup-row"><div class="setup-row-title">🫁 Bench press × 5</div><div class="setup-pair">
+      <div class="setup-row"><div class="setup-row-title">🏋️ Bench press × 5</div><div class="setup-pair">
         <label>START<input inputmode="decimal" id="startBench" type="number" step="0.5" required placeholder="80"></label>
         <label>END GOAL<input inputmode="decimal" id="goalBench" type="number" step="0.5" required placeholder="110"></label>
       </div></div>
@@ -875,11 +875,11 @@ input:focus,select:focus{
         <label>START<input inputmode="numeric" pattern="[0-9]*" id="startPull" type="number" step="1" required placeholder="3"></label>
         <label>END GOAL<input inputmode="decimal" id="goalPull" type="number" step="1" required placeholder="8"></label>
       </div></div>
-      <div class="setup-row"><div class="setup-row-title">🛡️ Deadlift × 3</div><div class="setup-pair">
+      <div class="setup-row"><div class="setup-row-title">🦵 Deadlift × 3</div><div class="setup-pair">
         <label>START<input inputmode="decimal" id="startDead" type="number" step="0.5" required placeholder="90"></label>
         <label>END GOAL<input inputmode="decimal" id="goalDead" type="number" step="0.5" required placeholder="140"></label>
       </div></div>
-      <div class="setup-row"><div class="setup-row-title">🍃 40 min Zone 2 distance</div><div class="setup-pair">
+      <div class="setup-row"><div class="setup-row-title">🫀 40 min Zone 2 distance</div><div class="setup-pair">
         <label>START<input inputmode="decimal" id="startRun" type="number" step="0.01" required placeholder="4.00"></label>
         <label>END GOAL<input inputmode="decimal" id="goalRun" type="number" step="0.01" required placeholder="5.00"></label>
       </div></div>
@@ -903,11 +903,11 @@ input:focus,select:focus{
 <script>
 const defaultTargets={bw:90,bench:110,pull:8,dead:140,run:5};
 const goals={
-  bw:{name:"Mass",icon:"💪",unit:"kg",format:v=>Number(v).toFixed(1)+" kg"},
-  bench:{name:"Push",icon:"🫁",unit:"kg",format:v=>Number(v).toFixed(1).replace(".0","")+" kg × 5"},
+  bw:{name:"Mass",icon:"⚖️",unit:"kg",format:v=>Number(v).toFixed(1)+" kg"},
+  bench:{name:"Push",icon:"🏋️",unit:"kg",format:v=>Number(v).toFixed(1).replace(".0","")+" kg × 5"},
   pull:{name:"Pull",icon:"🧗",unit:"reps",format:v=>Math.round(v)+" reps"},
-  dead:{name:"Power",icon:"🛡️",unit:"kg",format:v=>Number(v).toFixed(1).replace(".0","")+" kg × 3"},
-  run:{name:"Engine",icon:"🍃",unit:"km",format:v=>Number(v).toFixed(2)+" km"}
+  dead:{name:"Power",icon:"🦵",unit:"kg",format:v=>Number(v).toFixed(1).replace(".0","")+" kg × 3"},
+  run:{name:"Engine",icon:"🫀",unit:"km",format:v=>Number(v).toFixed(2)+" km"}
 };
 function target(k){return Number(state.targets?.[k] ?? defaultTargets[k])}
 const keys=Object.keys(goals),STORE="healthPowerRPG";
@@ -1139,8 +1139,8 @@ function formatRaw(k,v){if(v==null)return"—";if(k==="run")return Number(v).toF
 function renderPhysBars(){
   const p=physique(),proteinGoal=Number(state.proteinGoal)||180,proteinPct=clamp(proteinTotal()/proteinGoal,0,1);
   const rows=[
-    ["size","💪","Mass",p.mass],["chest","🫁","Bench Press",p.chest],["pull","🏋️","Pull-ups",p.pull],
-    ["thick","🛡️","Deadlift",p.thick],["lean","🍃","Zone 2 Cardio",p.lean],
+    ["size","⚖️","Mass",p.mass],["chest","🏋️","Bench Press",p.chest],["pull","🧗","Pull-ups",p.pull],
+    ["thick","🦵","Deadlift",p.thick],["lean","🫀","Zone 2 Cardio",p.lean],
     ["protein"+(proteinPct>=1?" complete":""),"🍗",`Protein LVL ${proteinLevel()}`,proteinPct]
   ];
   document.getElementById("physiqueBars").innerHTML=rows.map(r=>`<div class="phys-row ${r[0]}"><div class="phys-icon">${r[1]}</div><div><div class="phys-name"><span>${r[2]}</span><b>${Math.round(r[3]*100)}%</b></div><div class="bar"><div class="fill" style="width:${Math.round(r[3]*100)}%"></div></div></div></div>`).join("");
@@ -1200,10 +1200,16 @@ function updateSkill(){
  document.getElementById("goalPb").textContent=formatRaw(k,target(k));document.getElementById("goalUnit").textContent=g.unit;
  const input=document.getElementById("value");input.step=k==="run"?"0.01":k==="pull"?"1":"0.1";input.placeholder=k==="run"?"4.20":k==="pull"?"5":"90";
 }
+function populateProteinGoalPicker(selected=180){
+ const picker=document.getElementById("proteinGoal"),current=clamp(Math.round(Number(selected)||180),1,500),values=[];
+ for(let grams=1;grams<=500;grams++)values.push(grams);
+ picker.innerHTML=values.map(grams=>`<option value="${grams}">${grams} g per day</option>`).join("");
+ picker.value=String(current);
+}
 function openSetup(){
  const m=document.getElementById("setupModal");m.classList.add("open");m.setAttribute("aria-hidden","false");
  document.getElementById("playerName").value=state.name||"";
- document.getElementById("proteinGoal").value=state.proteinGoal||180;
+ populateProteinGoalPicker(state.proteinGoal||180);
  ["bw","bench","pull","dead","run"].forEach(k=>{
    const cap=k[0].toUpperCase()+k.slice(1);
    const startEl=document.getElementById("start"+cap);

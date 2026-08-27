@@ -505,13 +505,22 @@ input:focus,select:focus{
 }
 .toast-box strong{font-size:9px}.toast-box span{display:block;color:var(--muted);font-size:8px;margin-top:2px}
 
-/* full-screen daily protein level-up */
+/* full-screen milestone celebrations */
 .protein-celebration{
   position:fixed;inset:0;z-index:220;display:grid;place-items:center;overflow:hidden;
   visibility:hidden;opacity:0;pointer-events:none;
   background:radial-gradient(circle at 50% 45%,rgba(255,190,56,.28),rgba(84,48,150,.25) 38%,rgba(3,5,8,.94) 76%);
   backdrop-filter:blur(4px);
 }
+.protein-celebration[data-theme="pb"]{background:radial-gradient(circle at 50% 45%,rgba(244,88,110,.26),rgba(70,133,220,.26) 40%,rgba(3,5,8,.95) 77%)}
+.protein-celebration[data-theme="pb"]:before{background:repeating-conic-gradient(from 0deg,rgba(103,178,255,.2) 0 7deg,transparent 7deg 17deg)}
+.protein-celebration[data-theme="pb"] .protein-celebration-kicker{color:#ff8396}
+.protein-celebration[data-theme="pb"] .protein-celebration-level{text-shadow:0 0 8px #348bd9,0 0 22px #ef5870}
+.protein-celebration[data-theme="pb"] .protein-celebration-copy{color:#8fcaff}
+.protein-celebration[data-theme="level"],.protein-celebration[data-theme="evolution"]{background:radial-gradient(circle at 50% 45%,rgba(154,100,255,.32),rgba(255,184,47,.22) 42%,rgba(3,5,8,.95) 77%)}
+.protein-celebration[data-theme="level"]:before,.protein-celebration[data-theme="evolution"]:before{background:repeating-conic-gradient(from 0deg,rgba(172,121,255,.23) 0 7deg,transparent 7deg 17deg)}
+.protein-celebration[data-theme="level"] .protein-celebration-kicker,.protein-celebration[data-theme="evolution"] .protein-celebration-kicker{color:#bd8cff}
+.protein-celebration[data-theme="evolution"] .protein-celebration-avatar{filter:drop-shadow(0 0 24px rgba(177,122,255,.9)) drop-shadow(0 0 38px rgba(255,190,55,.45)) drop-shadow(0 14px 5px rgba(0,0,0,.7))}
 .protein-celebration.show{visibility:visible;animation:proteinScreen 2.9s ease-out both}
 .protein-celebration:before{
   content:"";position:absolute;width:155vmax;height:155vmax;
@@ -736,7 +745,7 @@ input:focus,select:focus{
 </head>
 <body>
 
-<main class="app" id="home" data-version="33">
+<main class="app" id="home" data-version="34">
   
 
   <section class="card physique-card" id="statsSection">
@@ -882,12 +891,12 @@ input:focus,select:focus{
 </div>
 
 <div class="toast" id="toast"><div class="toast-box"><div style="font-size:26px">⚡</div><div><strong id="toastTitle">New PB!</strong><span id="toastText"></span></div></div></div>
-<div class="protein-celebration" id="proteinCelebration" aria-hidden="true" aria-live="polite">
+<div class="protein-celebration" id="milestoneCelebration" data-theme="protein" aria-hidden="true" aria-live="polite">
   <div class="protein-celebration-card">
-    <div class="protein-celebration-avatar-wrap"><canvas class="protein-celebration-avatar" id="proteinCelebrationAvatar" width="320" height="400" aria-hidden="true"></canvas><div class="protein-celebration-icon">🍗</div></div>
-    <div class="protein-celebration-kicker">DAILY GOAL COMPLETE</div>
-    <div class="protein-celebration-level" id="proteinCelebrationLevel">PROTEIN LVL 2</div>
-    <div class="protein-celebration-copy" id="proteinCelebrationCopy">FULLY FUELLED!</div>
+    <div class="protein-celebration-avatar-wrap"><canvas class="protein-celebration-avatar" id="milestoneCelebrationAvatar" width="320" height="400" aria-hidden="true"></canvas><div class="protein-celebration-icon" id="milestoneCelebrationIcon">🍗</div></div>
+    <div class="protein-celebration-kicker" id="milestoneCelebrationKicker">DAILY GOAL COMPLETE</div>
+    <div class="protein-celebration-level" id="milestoneCelebrationTitle">PROTEIN LVL 2</div>
+    <div class="protein-celebration-copy" id="milestoneCelebrationCopy">FULLY FUELLED!</div>
   </div>
 </div>
 
@@ -1232,16 +1241,30 @@ function triggerEvolution(k,oldOverall,newOverall,oldSkill,newSkill,gain){
  badge.classList.remove("show");void badge.offsetWidth;badge.classList.add("show");
  setTimeout(()=>{ch.classList.remove("evolving-inline");ch.classList.add("idle");applyChar(ch);petEngine.evolutionEnd()},1500);
  if(navigator.vibrate)navigator.vibrate([35,30,65]);
+ showLevelCelebration(k,newOverall,newSkill,gain,newOverall>oldOverall);
 }
 function triggerCelebration(){petEngine.celebrate();if(navigator.vibrate)navigator.vibrate(35)}
 function showToast(title,text){toastTitle.textContent=title;toastText.textContent=text;toast.classList.add("show");clearTimeout(window.tst);window.tst=setTimeout(()=>toast.classList.remove("show"),2200)}
+function showMilestoneCelebration({theme="protein",icon="⚡",kicker,title,copy}){
+ const overlay=document.getElementById("milestoneCelebration"),avatar=document.getElementById("milestoneCelebrationAvatar");
+ overlay.dataset.theme=theme;avatar.dataset.form=String(spriteFormForLevel(overallLevel()));avatar.dataset.frame=String(PET_FRAME.flex);drawSprite(avatar);
+ document.getElementById("milestoneCelebrationIcon").textContent=icon;
+ document.getElementById("milestoneCelebrationKicker").textContent=kicker;
+ document.getElementById("milestoneCelebrationTitle").textContent=title;
+ document.getElementById("milestoneCelebrationCopy").textContent=copy;
+ clearTimeout(window.milestoneCelebrationTimer);overlay.classList.remove("show");void overlay.offsetWidth;overlay.classList.add("show");overlay.setAttribute("aria-hidden","false");
+ window.milestoneCelebrationTimer=setTimeout(()=>{overlay.classList.remove("show");overlay.setAttribute("aria-hidden","true")},2950);
+}
 function showProteinCelebration(){
- const overlay=document.getElementById("proteinCelebration");
- const avatar=document.getElementById("proteinCelebrationAvatar");avatar.dataset.form=String(spriteFormForLevel(overallLevel()));avatar.dataset.frame=String(PET_FRAME.flex);drawSprite(avatar);
- document.getElementById("proteinCelebrationLevel").textContent=`PROTEIN LVL ${proteinLevel()}`;
- document.getElementById("proteinCelebrationCopy").textContent=`${(state.name||"YOUR HERO").toUpperCase()} IS FULLY FUELLED!`;
- clearTimeout(window.proteinCelebrationTimer);overlay.classList.remove("show");void overlay.offsetWidth;overlay.classList.add("show");overlay.setAttribute("aria-hidden","false");
- window.proteinCelebrationTimer=setTimeout(()=>{overlay.classList.remove("show");overlay.setAttribute("aria-hidden","true")},2950);
+ showMilestoneCelebration({theme:"protein",icon:"🍗",kicker:"DAILY GOAL COMPLETE",title:`PROTEIN LVL ${proteinLevel()}`,copy:`${(state.name||"YOUR HERO").toUpperCase()} IS FULLY FUELLED!`});
+}
+function showPbCelebration(k,value,gain){
+ showMilestoneCelebration({theme:"pb",icon:goals[k].icon,kicker:`${goals[k].name.toUpperCase()} PERSONAL BEST`,title:"NEW PB!",copy:`${goals[k].format(value)} • +${gain} XP`});
+}
+function showLevelCelebration(k,newOverall,newSkill,gain,overallUp){
+ const stage=stageFor(newOverall),name=(state.name||"YOUR HERO").toUpperCase();
+ if(overallUp)showMilestoneCelebration({theme:"evolution",icon:newOverall===10?"🏆":"⚡",kicker:"EVOLUTION COMPLETE",title:`LEVEL ${newOverall} • ${stage[0]}`,copy:`${name} EVOLVED! • +${gain} XP`});
+ else showMilestoneCelebration({theme:"level",icon:goals[k].icon,kicker:`${goals[k].name.toUpperCase()} LEVEL UP`,title:`${goals[k].name.toUpperCase()} LVL ${newSkill}`,copy:`NEW PB • ${goals[k].format(state.pb[k])} • +${gain} XP`});
 }
 function scrollToId(id){document.getElementById(id).scrollIntoView({behavior:"smooth",block:"start"})}
 
@@ -1255,7 +1278,7 @@ pbForm.addEventListener("submit",e=>{
  const newScore=score(),newSkill=skillLevel(k),newOverall=overallLevel(),gain=Math.max(0,newScore-oldScore),d=localDay();
  state.history.push({skill:k,value:n,date:d,xp:gain});render();value.value="";
  message.className="message success";message.textContent=`🎉 NEW PB! ${goals[k].format(n)} • +${gain} XP`;
- if(newSkill>oldSkill||newOverall>oldOverall)triggerEvolution(k,oldOverall,newOverall,oldSkill,newSkill,gain);else{triggerCelebration();showToast("NEW PB!",`${goals[k].format(n)} • +${gain} XP`)}
+ if(newSkill>oldSkill||newOverall>oldOverall)triggerEvolution(k,oldOverall,newOverall,oldSkill,newSkill,gain);else{triggerCelebration();showPbCelebration(k,n,gain)}
 });
 function resetGame(){
  if(!confirm("Start over? This will erase your starting stats, goals, protein levels, PB history and XP on this device."))return;
